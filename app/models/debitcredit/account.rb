@@ -7,23 +7,22 @@ module Debitcredit
     validates :name, :balance, presence: true
     validate :prevent_overdraft, unless: :overdraft_enabled?
 
-    scope :asset,     ->{where(type: AssetAccount.name)}
-    scope :equity,    ->{where(type: EquityAccount.name)}
-    scope :liability, ->{where(type: LiabilityAccount.name)}
-    scope :expense,   ->{where(type: ExpenseAccount.name)}
-    scope :income,    ->{where(type: IncomeAccount.name)}
+    scope :asset,     -> { where(type: AssetAccount.name) }
+    scope :equity,    -> { where(type: EquityAccount.name) }
+    scope :liability, -> { where(type: LiabilityAccount.name) }
+    scope :expense,   -> { where(type: ExpenseAccount.name) }
+    scope :income,    -> { where(type: IncomeAccount.name) }
 
-    scope :by_id, ->{order(:id)}
+    scope :by_id, -> { order(:id) }
 
     class NotFound < StandardError; end
     class BadKind < StandardError; end
     class << self
-      def by_kind kind
+      def by_kind(kind)
         Debitcredit.const_get "#{kind.to_s.capitalize}Account"
       end
 
       def find_or_create(name, kind = nil, overdraft = false)
-
         unless account = find_by(name: name)
           # Note: reference is automatically provided by association
           # when running through an association, e.g. @user.accounts[ .... ]
@@ -38,11 +37,12 @@ module Debitcredit
         raise BadKind if kind && by_kind(kind) != account.class
 
         if overdraft != account.overdraft_enabled?
-          account.update_attributes! overdraft_enabled: overdraft
+          account.update_attribute(:overdraft_enabled, overdraft)
         end
 
-        return account
+        account
       end
+
       alias :[] :find_or_create
 
       def total_balance
@@ -77,7 +77,7 @@ module Debitcredit
     def prevent_overdraft
       return unless balance_changed?
       return unless check_overdraft
-      return unless balance < 0
+      return unless overdraft?
       return unless balance_was > balance
 
       errors.add(:balance, :overdraft)

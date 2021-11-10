@@ -1,7 +1,7 @@
 module Debitcredit
   RSpec.describe Account do
     def described_class; Debitcredit::AssetAccount; end
-    def valid_attrs; {name: 'foo'} end
+    def valid_attrs; { name: 'foo' } end
 
     describe '.by_kind' do
       it 'should find account class by kind' do
