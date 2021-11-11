@@ -29,6 +29,7 @@ class Debitcredit::Entry::Dsl
   end
 
   private
+
   def build_item(debit, account, amount, comment)
     account = entry.reference.accounts[account] if account.is_a?(Symbol) && entry.reference.try(:respond_to?, :accounts)
     entry.items.build debit: debit, account: account, amount: amount, comment: comment
