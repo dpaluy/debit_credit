@@ -1,0 +1,46 @@
+<% database = ENV.fetch("DB", "sqlite") %>
+<% raise "Unsupported DB=#{database}" unless %w[sqlite postgresql].include?(database) %>
+<% postgres = database == "postgresql" %>
+
+<% if postgres %>
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+<% if ENV["DATABASE_URL"] %>
+  url: <%= ENV["DATABASE_URL"] %>
+<% else %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "") %>
+<% end %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB", "debitcredit_test") %>
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB", "debitcredit_test") %>
+
+production:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB", "debitcredit_test") %>
+<% else %>
+default: &default
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  timeout: 5000
+
+development:
+  <<: *default
+  database: db/development.sqlite3
+
+test:
+  <<: *default
+  database: db/test.sqlite3
+
+production:
+  <<: *default
+  database: db/production.sqlite3
+<% end %>

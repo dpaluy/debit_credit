@@ -1,13 +1,23 @@
 begin
-  require 'bundler/setup'
+  require "bundler/setup"
 rescue LoadError
-  puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
+  warn "You must `gem install bundler` and `bundle install` to run rake tasks"
 end
 
-APP_RAKEFILE = File.expand_path("../spec/test_app/Rakefile", __FILE__)
-load 'rails/tasks/engine.rake'
+APP_RAKEFILE = File.expand_path("test/dummy/Rakefile", __dir__)
 
-load 'rails/tasks/statistics.rake'
+load "rails/tasks/engine.rake"
+task "debitcredit:install:migrations" => "app:debitcredit:install:migrations"
 
-require 'bundler/gem_tasks'
+Rake::Task["app:db:load_config"].enhance do
+  engine_migrations = File.expand_path("db/migrate", __dir__)
+  paths = ActiveRecord::Tasks::DatabaseTasks.migrations_paths.reject do |path|
+    File.expand_path(path) == engine_migrations
+  end
+  ActiveRecord::Tasks::DatabaseTasks.migrations_paths = paths
+  ActiveRecord::Migrator.migrations_paths = paths
+end
 
+load File.expand_path("lib/tasks/dummy_boot.rake", __dir__)
+
+require "bundler/gem_tasks"
