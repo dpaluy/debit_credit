@@ -3,7 +3,7 @@ module Debitcredit
     isolate_namespace Debitcredit
     config.generators do |g|
       g.api_only = true
-      g.test_framework :rspec
+      g.test_framework :minitest
     end
   end
 end
