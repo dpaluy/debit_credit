@@ -137,42 +137,49 @@ Create `skills/debitcredit-ledger/SKILL.md` with valid YAML frontmatter and an a
 
 ## Fork Detachment
 
-Use GitHub's supported **Leave fork network** operation rather than deleting and recreating the repository.
+The owner used GitHub's supported **Leave fork network** operation on 2026-07-18. Verification after the operation showed:
 
-Preconditions:
+- `dpaluy/debitcredit-ledger` is public and reports `isFork=false`
+- `parent` and `source` are null
+- network count is zero
+- local and remote `master` both point to `fc08994b24395e123c2e772d4b9d6b187e123138`
 
-- repository is public
-- repository size is below 1 GB
-- repository has no child forks
-- local and remote commit parity is verified
-- current metadata is captured for the handoff record
+Git history was preserved. The repository is now an independent project and cannot be reconnected to the former fork network. GitHub Issues remained disabled after detachment and must be enabled before creating the project backlog or modernization pull request.
 
-GitHub documents detachment as permanent. Git history is preserved, but issues, pull requests, stars, watchers, comments, wikis, child forks, and other network metadata are not retained. Therefore detachment must happen before creating the MySQL issue or modernization pull request.
+## GitHub Issues and Deferred Work
 
-Sequence:
+GitHub Issues is the source of truth for every future improvement that is intentionally deferred from this modernization release. Deferred work must not remain only in prose, chat history, the design document, or agent memory.
 
-1. Capture current repository metadata and verify eligibility.
-2. Use Settings → General → Danger Zone → Leave fork network.
-3. Verify the repository reports `isFork=false` and still points to the expected commit.
-4. Enable GitHub Issues.
-5. Create the MySQL support issue.
-6. Push the modernization branch and open its pull request.
+After enabling Issues, create an initial backlog with one focused issue per independently deliverable improvement:
 
-If the UI option is unavailable despite meeting the documented preconditions, use GitHub's fork support request. Do not use the destructive delete/recreate fallback without a new explicit approval.
+1. `Add MySQL support and CI coverage`
+   - MySQL service in GitHub Actions
+   - dummy-app database configuration
+   - migration compatibility
+   - decimal, locking, and transaction behavior
+   - the same Minitest suite passing without weakening SQLite or PostgreSQL
+2. `Prevent posted entries and items from mutating or being destroyed`
+   - enforce immutability or safe reversal-only correction
+   - prevent stored account balances from becoming stale
+3. `Harden inverse-entry validation and concurrent reversal handling`
+   - graceful missing-parent validation
+   - database-backed uniqueness and concurrent-attempt coverage
+4. `Strengthen entry and item validation`
+   - reject empty entries
+   - return validation errors rather than exceptions for malformed amounts
+   - define zero-amount behavior
+5. `Modernize ledger schema constraints and identifier widths`
+   - bigint-compatible identifiers
+   - foreign keys and non-null constraints
+   - collision-safe index names and polymorphic type width
+6. `Harden concurrent account creation and balance verification`
+   - race-safe lookup/creation
+   - define and test the consistency semantics of global balance checks
+7. `Add idempotent posting and ledger reconciliation`
+   - caller-provided idempotency contract
+   - drift detection and safe derived-balance rebuild
 
-## MySQL Follow-up Issue
-
-After detachment, create an issue titled `Add MySQL support and CI coverage` describing:
-
-- a MySQL service in GitHub Actions
-- dummy-app database configuration
-- migration compatibility
-- decimal behavior
-- locking and transaction semantics
-- adapter-specific tests
-- documentation updates
-
-Acceptance requires the same Minitest suite to pass against MySQL without weakening SQLite or PostgreSQL coverage.
+Each issue must include motivation, current evidence, proposed acceptance criteria, and the modernization release boundary. Issues may be split further during implementation, but unrelated improvements must not be bundled into one catch-all ticket.
 
 ## Documentation
 
@@ -206,5 +213,5 @@ The modernization is complete when:
 - gem build and install smoke checks pass without warnings
 - `AGENTS.md` and `skills/debitcredit-ledger/SKILL.md` are present and internally consistent
 - README and changelog identify the project as a maintained fork of the original gem
-- GitHub Issues is enabled and the verified MySQL follow-up issue exists
+- GitHub Issues is enabled and every deferred improvement listed in this design has a verified issue URL
 - no RubyGems publication occurs without separate approval
