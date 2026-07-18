@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - modernization-design
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (${{ matrix.db }})
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        db: [sqlite, postgresql]
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: debitcredit_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d debitcredit_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB: ${{ matrix.db }}
+      POSTGRES_HOST: localhost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: debitcredit_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      # CI verifies Ruby 4.x with Rails 8.x. The gem declares lower bounds only,
+      # so later compatible Ruby and Rails versions remain installable.
+      - name: Prepare database
+        run: bin/rails app:db:prepare
+      - name: Run Minitest
+        run: bundle exec rake test
+
+  style:
+    name: style
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      - run: bundle exec rake style
+
+  build:
+    name: build
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      - run: gem build debitcredit-ledger.gemspec
+
+  install_smoke:
+    name: install smoke
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      - name: Build and install artifact
+        run: |
+          mkdir -p pkg
+          gem build debitcredit-ledger.gemspec --output pkg/debitcredit-ledger-1.0.0.gem
+          smoke_dir="$(mktemp -d)"
+          gem install --install-dir "$smoke_dir" --no-document ./pkg/debitcredit-ledger-1.0.0.gem
+          GEM_HOME="$smoke_dir" GEM_PATH="$smoke_dir" ruby -e 'require "debitcredit"; abort "ver" unless Debitcredit::VERSION == "1.0.0"; puts Debitcredit::Entry'
+
+  contents:
+    name: package contents
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      - name: Check package contents
+        run: |
+          mkdir -p pkg
+          gem build debitcredit-ledger.gemspec --output pkg/debitcredit-ledger-1.0.0.gem
+          tar -xOf pkg/debitcredit-ledger-1.0.0.gem data.tar.gz | tar -tzf - > package-files.txt
+          for path in \
+            lib/debitcredit.rb \
+            lib/debitcredit/version.rb \
+            lib/debitcredit/engine.rb \
+            app/models/debitcredit/account.rb \
+            db/migrate/20140121145455_create_debitcredit_accounts.rb \
+            config/locales/en.yml \
+            MIT-LICENSE \
+            Rakefile \
+            README.md \
+            CHANGELOG.md; do
+            grep -Fx "$path" package-files.txt
+          done
+          ! grep -E '^(test|\.github|spec|pkg)/|(^|/)Gemfile\.lock$|\.gem$' package-files.txt
