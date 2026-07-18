@@ -1,3 +1,15 @@
+# Changelog
+
+## 1.0.0 (2026-07-18)
+
+First release of the maintained `debitcredit-ledger` continuation. This is a
+modernization of the original `vitaly/debitcredit` project (MIT) to Ruby 4.0+
+and Rails 8.0+ lower bounds, fixture-backed Minitest, and SQLite plus
+PostgreSQL CI. No ledger behavior changes were made. This release prepares the
+artifact but does not claim a RubyGems publication.
+
+## Prior history (original vitaly/debitcredit)
+
 * 1.1.6
   - Rails 6 fixes
   - fix specs
@@ -23,7 +35,7 @@
   - fixed name of the Dsl module
   - dsl methods to set kind, description and reference
 
-*.0.0.8
+* 0.0.0.8
   - fix blocks on DSL
 
 * 0.0.7
@@ -35,3 +47,7 @@
 
 * 0.0.5
   - has_accounts and has_transactions extension
+
+The original project was authored by Vitaly Kushner and remains covered by the
+MIT license in `MIT-LICENSE`. The deferred modernization hardening backlog is
+tracked in GitHub Issues #2 through #8.
