@@ -1,0 +1,110 @@
+plugins:
+  - rubocop-minitest
+
+AllCops:
+  TargetRubyVersion: 4.0
+  NewCops: disable
+  SuggestExtensions: false
+  Exclude:
+    - "db/migrate/**/*"
+    - "test/dummy/db/migrate/**/*"
+    - "test/dummy/db/schema.rb"
+
+Layout/LineLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/MutableConstant:
+  Enabled: false
+
+Style/OptionalBooleanParameter:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Style/CommentAnnotation:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Alias:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/YodaCondition:
+  Enabled: false
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Naming/PredicatePrefix:
+  Enabled: false
+
+Lint/NestedMethodDefinition:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+
+Layout/SpaceAroundOperators:
+  Enabled: false
+
+Gemspec/OrderedDependencies:
+  Enabled: false
+
+Minitest/AssertInstanceOf:
+  Enabled: false
+
+Minitest/AssertTruthy:
+  Enabled: false
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false

@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pg"
   spec.add_development_dependency "minitest"
   spec.add_development_dependency "rubocop", "~> 1.88"
+  spec.add_development_dependency "rubocop-minitest"
 end

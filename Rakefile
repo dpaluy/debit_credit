@@ -28,4 +28,8 @@ end
 
 task default: :test
 
+require "rubocop/rake_task"
+RuboCop::RakeTask.new(:rubocop)
+task style: :rubocop
+
 require "bundler/gem_tasks"
