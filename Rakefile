@@ -20,4 +20,12 @@ end
 
 load File.expand_path("lib/tasks/dummy_boot.rake", __dir__)
 
+require "rake/testtask"
+Rake::TestTask.new(:test) do |task|
+  task.libs << "test"
+  task.pattern = "test/**/*_test.rb"
+end
+
+task default: :test
+
 require "bundler/gem_tasks"
