@@ -9,9 +9,7 @@ AllCops:
     - "db/migrate/**/*"
     - "test/dummy/db/migrate/**/*"
     - "test/dummy/db/schema.rb"
-
-Rake/Desc:
-  Enabled: false
+    - "vendor/**/*"
 
 Layout/LineLength:
   Enabled: false
