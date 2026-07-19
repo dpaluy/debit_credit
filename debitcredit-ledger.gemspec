@@ -24,14 +24,14 @@ Gem::Specification.new do |s|
 
   # Only lower bounds. Never add a Ruby or Rails upper bound.
   s.required_ruby_version = ">= 4.0"
-  s.add_dependency "rails", ">= 8.0"
   s.add_dependency "docile"
+  s.add_dependency "rails", ">= 8.0"
 
-  s.add_development_dependency "sqlite3"
-  s.add_development_dependency "pg"
   s.add_development_dependency "minitest"
+  s.add_development_dependency "pg"
   s.add_development_dependency "rubocop", "~> 1.88"
   s.add_development_dependency "rubocop-minitest", "~> 0.39"
+  s.add_development_dependency "sqlite3"
 
   # Deterministic package contents. Excludes tests, CI, lockfile, built gems.
   s.files = Dir[

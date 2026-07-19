@@ -23,6 +23,7 @@ module Debitcredit
       r = record
       r.save!
       r.inverse
+
       assert_not r.changed?
     end
 
@@ -39,8 +40,8 @@ module Debitcredit
     end
 
     test ".inverse inverts kind" do
-      assert _record(debit: true).inverse.credit?
-      assert _record(debit: false).inverse.debit?
+      assert_predicate _record(debit: true).inverse, :credit?
+      assert_predicate _record(debit: false).inverse, :debit?
     end
   end
 end

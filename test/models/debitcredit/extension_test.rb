@@ -4,7 +4,8 @@ module Debitcredit
   class ExtensionTest < ActiveSupport::TestCase
     test "has_accounts defines methods that create accounts" do
       acc = users(:john).accounts.cash
-      assert_equal Debitcredit::AssetAccount, acc.class
+
+      assert_instance_of Debitcredit::AssetAccount, acc
       assert_equal users(:john).accounts[:cash], acc
     end
 

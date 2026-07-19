@@ -14,7 +14,7 @@ module RecordHelpers
   # mirroring the original RSpec `record(attrs)` memoizing helper semantics for
   # the first call while allowing explicit fresh builds via `_record`.
   def record(attrs = {})
-    @_record ||= _record(attrs)
+    @record ||= _record(attrs)
   end
 
   def _record(overrides = {})

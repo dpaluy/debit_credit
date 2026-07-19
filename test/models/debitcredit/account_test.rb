@@ -3,12 +3,12 @@ require "test_helper"
 module Debitcredit
   class AccountTest < ActiveSupport::TestCase
     # Fixtures: users(:john), users(:bill), debitcredit_accounts(:name).
-    def equipment; debitcredit_accounts(:equipment); end
-    def rent;      debitcredit_accounts(:rent);      end
-    def bank;      debitcredit_accounts(:bank);      end
-    def amex;      debitcredit_accounts(:amex);      end
-    def capital;   debitcredit_accounts(:capital);   end
-    def salary;    debitcredit_accounts(:salary);    end
+    def equipment = debitcredit_accounts(:equipment)
+    def rent = debitcredit_accounts(:rent)
+    def bank = debitcredit_accounts(:bank)
+    def amex = debitcredit_accounts(:amex)
+    def capital = debitcredit_accounts(:capital)
+    def salary = debitcredit_accounts(:salary)
 
     test ".by_kind finds account class by kind" do
       assert_equal Debitcredit::AssetAccount, Debitcredit::Account.by_kind(:asset)
@@ -29,7 +29,8 @@ module Debitcredit
     test "[] creates account if kind is provided and none exists" do
       assert_difference -> { Debitcredit::Account.count }, 1 do
         foo = Debitcredit::Account[:foo, :expense]
-        assert_equal Debitcredit::ExpenseAccount, foo.class
+
+        assert_instance_of Debitcredit::ExpenseAccount, foo
         assert_equal "foo", foo.name
         assert_equal 0, foo.balance
       end
@@ -43,7 +44,8 @@ module Debitcredit
     test "[] updates overdraft if different" do
       assert_not rent.overdraft_enabled?
       Debitcredit::Account[:rent, :expense, true]
-      assert rent.reload.overdraft_enabled?
+
+      assert_predicate rent.reload, :overdraft_enabled?
     end
 
     test "[] raises BadKind on different kind" do
@@ -54,18 +56,20 @@ module Debitcredit
 
     test "[] creates with reference via association" do
       foo = users(:john).accounts[:foo, :asset]
+
       assert_equal users(:john), foo.reference
-      assert_equal Debitcredit::AssetAccount, foo.class
+      assert_instance_of Debitcredit::AssetAccount, foo
       assert_equal "foo", foo.name
     end
 
     test ".balanced? is initially true" do
-      assert Debitcredit::Account.balanced?
+      assert_predicate Debitcredit::Account, :balanced?
     end
 
     test ".balanced? is false if out of balance" do
       equipment.balance += 1
       equipment.save!
+
       assert_not Debitcredit::Account.balanced?
     end
 
@@ -85,7 +89,7 @@ module Debitcredit
       salary.balance += 8
       salary.save!
 
-      assert Debitcredit::Account.balanced?
+      assert_predicate Debitcredit::Account, :balanced?
     end
   end
 
@@ -108,6 +112,7 @@ module Debitcredit
       r.save!
       r.check_overdraft = true
       r.balance = -1
+
       assert_not r.valid?
       assert_not r.errors[:balance].blank?
     end
@@ -116,14 +121,16 @@ module Debitcredit
       r = record
       r.save!
       r.balance = -1
-      assert r.valid?
+
+      assert_predicate r, :valid?
     end
 
     test "allows keeping negative balance" do
       r = _record(balance: -10)
       r.save
       r.check_overdraft = true
-      assert r.valid?
+
+      assert_predicate r, :valid?
     end
 
     test "allows + on negative balance" do
@@ -131,7 +138,8 @@ module Debitcredit
       r.save
       r.check_overdraft = true
       r.balance = -5
-      assert r.valid?
+
+      assert_predicate r, :valid?
     end
 
     test "allows - on positive balance" do
@@ -139,7 +147,8 @@ module Debitcredit
       r.save
       r.check_overdraft = true
       r.balance = 5
-      assert r.valid?
+
+      assert_predicate r, :valid?
     end
   end
 
@@ -161,8 +170,9 @@ module Debitcredit
       r = record
       r.save!
       r.balance = -1
-      assert r.valid?
-      assert r.errors[:balance].blank?
+
+      assert_predicate r, :valid?
+      assert_predicate r.errors[:balance], :blank?
     end
   end
 end

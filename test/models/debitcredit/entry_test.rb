@@ -6,18 +6,18 @@ module Debitcredit
       { description: "something", reference: users(:john) }
     end
 
-    def equipment; debitcredit_accounts(:equipment); end
-    def bank;      debitcredit_accounts(:bank);      end
-    def amex;      debitcredit_accounts(:amex);      end
-    def rent;      debitcredit_accounts(:rent);      end
-    def capital;   debitcredit_accounts(:capital);   end
+    def equipment = debitcredit_accounts(:equipment)
+    def bank = debitcredit_accounts(:bank)
+    def amex = debitcredit_accounts(:amex)
+    def rent = debitcredit_accounts(:rent)
+    def capital = debitcredit_accounts(:capital)
 
     def entry
       debitcredit_entries(:laptop_purchase)
     end
 
-    def prepare(opts = {}, &block)
-      @r = Debitcredit::Entry.prepare(valid_attrs.merge(opts), &block)
+    def prepare(opts = {}, &)
+      @r = Debitcredit::Entry.prepare(valid_attrs.merge(opts), &)
     end
 
     # ---- validations ----
@@ -28,26 +28,31 @@ module Debitcredit
 
     test "sets kind" do
       t = prepare { kind "foo" }
+
       assert_equal "foo", t.kind
     end
 
     test "sets description" do
       t = prepare { description "bar" }
+
       assert_equal "bar", t.description
     end
 
     test "sets alias description" do
       t = prepare { desc "baz" }
+
       assert_equal "baz", t.description
     end
 
     test "sets reference" do
       t = prepare { reference users(:bill) }
+
       assert_equal users(:bill), t.reference
     end
 
     test "aliases reference" do
       t = prepare { ref users(:bill) }
+
       assert_equal users(:bill), t.reference
     end
 
@@ -57,8 +62,9 @@ module Debitcredit
         credit amex, 1_000
         debit  rent, 1_100
       end
-      assert t.balanced?
-      assert t.valid?
+
+      assert_predicate t, :balanced?
+      assert_predicate t, :valid?
     end
 
     test "is not valid with unbalanced items" do
@@ -66,6 +72,7 @@ module Debitcredit
         credit amex, 1_000
         debit rent, 999
       end
+
       assert_not t.balanced?
       assert_not t.valid?
     end
@@ -85,7 +92,7 @@ module Debitcredit
         credit amex2,     50
       end
 
-      assert t.valid?
+      assert_predicate t, :valid?
       t.save!
 
       assert_equal 11_100, equipment.reload.balance
@@ -110,6 +117,7 @@ module Debitcredit
         debit :equipment, 100
         credit :bank, 100
       end
+
       assert_equal [equipment, bank], t.items.map(&:account)
     end
 
@@ -117,43 +125,51 @@ module Debitcredit
 
     test ".inverse is valid" do
       inverse = entry.inverse
-      assert inverse.valid?
+
+      assert_predicate inverse, :valid?
     end
 
     test ".inverse takes description and kind" do
       inverse = entry.inverse(description: "foo", kind: "rollback")
+
       assert_equal "foo", inverse.description
       assert_equal "rollback", inverse.kind
     end
 
     test ".inverse has default description" do
       inverse = entry.inverse(kind: "rollback")
+
       assert_equal "reverse of tr ##{entry.id}: apple MBPr", inverse.description
     end
 
     test ".inverse has default kind" do
       inverse = entry.inverse
+
       assert_equal "rollback", inverse.kind
     end
 
     test ".inverse has default reference" do
       inverse = entry.inverse
+
       assert_equal entry.reference, inverse.reference
     end
 
     test ".inverse sets default parent_entry_id" do
       inverse = entry.inverse
+
       assert_equal entry, inverse.parent_entry
     end
 
     test ".inverse sets inverse_entry_id on parent" do
       inverse = entry.inverse
       inverse.save!
+
       assert_equal inverse, entry.reload.inverse_entry
     end
 
     test ".inverse does not allow inversing inversed entries" do
       entry.inverse.save!
+
       assert_not entry.inverse.valid?
     end
 
@@ -164,7 +180,7 @@ module Debitcredit
 
     test ".inverse sets ignore_overdraft to true" do
       assert_nil entry.ignore_overdraft
-      assert_equal true, entry.inverse.ignore_overdraft
+      assert entry.inverse.ignore_overdraft
     end
   end
 end
