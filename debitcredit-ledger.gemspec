@@ -4,14 +4,14 @@ Gem::Specification.new do |s|
   s.name = "debitcredit-ledger"
   s.version = Debitcredit::VERSION
 
-  s.authors = ["Vitaly Kushner"]
-  s.email = ["vitaly@astrails.com"]
+  s.authors = ["David Paluy"]
+  s.email = ["dpaluy@users.noreply.github.com"]
   s.license = "MIT"
 
   s.summary = "Double-entry accounting for Rails applications"
-  s.description = "Double-entry accounting for Rails applications. " \
-                  "debitcredit-ledger is a maintained continuation of the " \
-                  "original vitaly/debitcredit gem (MIT)."
+  s.description = "Double-entry accounting engine for Rails. Provides typed " \
+                  "accounts (asset, liability, equity, income, expense), " \
+                  "balanced entries, references, and inverse/rollback entries."
 
   s.homepage = "https://github.com/dpaluy/debitcredit-ledger"
   s.metadata = {

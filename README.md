@@ -2,17 +2,14 @@
 
 Double-entry accounting for Rails applications.
 
-`debitcredit-ledger` is a maintained continuation of the original
-MIT-licensed [`vitaly/debitcredit`](https://github.com/vitaly/debitcredit)
-gem by **Vitaly Kushner**. This repository continues the project as an
-independent, detached fork with modernized tooling. The Ruby namespace and
-require path are unchanged:
-
 ```ruby
 require "debitcredit"
 Debitcredit::Entry
 Debitcredit::Account
 ```
+
+The distribution/gem name is `debitcredit-ledger`; the Ruby namespace is
+`Debitcredit` and the require path is `require "debitcredit"`.
 
 ## Installation
 
@@ -28,9 +25,6 @@ Then run:
 bundle install
 bundle exec rake debitcredit:install:migrations db:migrate
 ```
-
-The require path is still `require "debitcredit"`; only the distribution/gem
-name changed to `debitcredit-ledger`.
 
 ## Compatibility
 
@@ -79,21 +73,6 @@ API-only dummy app at `test/dummy`.
 See `AGENTS.md` and `skills/debitcredit-ledger/SKILL.md` for the agent contract
 and repository workflow.
 
-## Upgrade from the original vitaly/debitcredit
-
-If you are migrating from the original gem:
-
-1. Replace `gem "debitcredit"` with `gem "debitcredit-ledger"` in your Gemfile.
-2. The Ruby namespace (`Debitcredit`) and require path (`require "debitcredit"`)
-   are unchanged.
-3. Run `bundle exec rake debitcredit:install:migrations db:migrate` to pick up
-   any new migrations.
-
-> **Historical note:** version 0.2.0 of the original gem introduced
-> backwards-incompatible changes (transactions were renamed to entries:
-> `Transaction` → `Entry`, `transactions` → `entries`,
-> `has_transactions` → `has_entries`). This continuation starts at `1.0.0`.
-
 ## Account Types, Debits and Credits
 
 <http://en.wikipedia.org/wiki/Debits_and_credits>
@@ -111,8 +90,8 @@ owes to others.
 the assets of that business/entity. e.g. capital, retained earnings, drawings,
 common stock, accumulated funds, etc.
 
-**Income** is increases in economic benefits during the accounting period in
-the form of inflows or enhancements of assets or decreases of liabilities that
+**Income** is increases in economic benefits during the accounting period in the
+form of inflows or enhancements of assets or decreases of liabilities that
 result in increases in equity, other than those relating to contributions from
 equity participants.
 
@@ -266,5 +245,4 @@ Deferred ledger-integrity hardening work is tracked in Issues
 
 ## License
 
-This project is released under the MIT License, preserving the original
-attribution to **Vitaly Kushner** (© 2018). See [`MIT-LICENSE`](./MIT-LICENSE).
+This project is released under the MIT License. See [`MIT-LICENSE`](./MIT-LICENSE).
