@@ -7,12 +7,6 @@ test/dummy/db/*.sqlite3
 test/dummy/db/*.sqlite3-journal
 test/dummy/log/*.log
 test/dummy/tmp/
-# legacy (removed in Slice D, kept until then)
-spec/examples.txt
-spec/test_app/db/*.sqlite3
-spec/test_app/db/*.sqlite3-journal
-spec/test_app/log/*.log
-spec/test_app/tmp/
 .byebug_history
 .ruby-version
 /coverage/
