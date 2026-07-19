@@ -10,6 +10,9 @@ AllCops:
     - "test/dummy/db/migrate/**/*"
     - "test/dummy/db/schema.rb"
 
+Rake/Desc:
+  Enabled: false
+
 Layout/LineLength:
   Enabled: false
 
