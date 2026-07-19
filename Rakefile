@@ -15,7 +15,7 @@ Rake::TestTask.new(:test) do |t|
   t.pattern = "test/**/*_test.rb"
 end
 
-# Top-level alias so `rake dummy:boot` works as documented in AGENTS.md/SKILL.md.
+# Top-level alias so `rake dummy:boot` works as documented in AGENTS.md.
 task "dummy:boot" => "app:dummy:boot"
 
 task default: :test

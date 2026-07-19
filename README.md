@@ -39,9 +39,6 @@ GitHub Actions CI matrix defines the **verified** combinations:
 - Ruby 4.x with Rails 8.x
 - SQLite and PostgreSQL
 
-No MySQL support yet (tracked in
-[#2](https://github.com/dpaluy/debitcredit-ledger/issues/2)).
-
 ## Supported databases
 
 Select the database with the `DB` environment variable (default `sqlite`):
@@ -70,8 +67,7 @@ gem build debitcredit-ledger.gemspec # no warnings expected
 Tests are fixture-backed Minitest. The test database is managed by a Rails 8
 API-only dummy app at `test/dummy`.
 
-See `AGENTS.md` and `skills/debitcredit-ledger/SKILL.md` for the agent contract
-and repository workflow.
+See `AGENTS.md` for repository guidance.
 
 ## Account Types, Debits and Credits
 
@@ -239,9 +235,6 @@ accounts with `overdraft_enabled: false`.  if this is undesirable, pass
 
 Bug reports and pull requests are welcome on
 [GitHub](https://github.com/dpaluy/debitcredit-ledger/issues).
-
-Deferred ledger-integrity hardening work is tracked in Issues
-[#2](https://github.com/dpaluy/debitcredit-ledger/issues/2)–[#8](https://github.com/dpaluy/debitcredit-ledger/issues/8).
 
 ## License
 

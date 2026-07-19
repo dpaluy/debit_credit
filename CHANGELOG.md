@@ -9,6 +9,6 @@
 - Added a Rails 8 API-only dummy app at `test/dummy`.
 - CI on GitHub Actions covers Ruby 4.x against SQLite and PostgreSQL.
 - Added build, style (RuboCop), and install/require smoke jobs.
-- Added `AGENTS.md` and `skills/debitcredit-ledger/SKILL.md` for agent guidance.
+- Added `AGENTS.md` for repository guidance.
 
 No ledger behavior changes in this release.

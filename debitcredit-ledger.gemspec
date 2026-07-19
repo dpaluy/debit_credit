@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version = Debitcredit::VERSION
 
   s.authors = ["David Paluy"]
-  s.email = ["dpaluy@users.noreply.github.com"]
+  s.email = ["david@paluy.com"]
   s.license = "MIT"
 
   s.summary = "Double-entry accounting for Rails applications"
