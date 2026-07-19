@@ -1,28 +1,98 @@
-# Debitcredit
+# debitcredit-ledger
 
-[![Build Status](https://travis-ci.org/vitaly/debitcredit.png)](https://travis-ci.org/vitaly/debitcredit)
-[![Code Climate](https://codeclimate.com/github/vitaly/debitcredit.png)](https://codeclimate.com/github/vitaly/debitcredit)
+Double-entry accounting for Rails applications.
 
-Double Entry Accounting for Rails Applications
+`debitcredit-ledger` is a maintained continuation of the original
+MIT-licensed [`vitaly/debitcredit`](https://github.com/vitaly/debitcredit)
+gem by **Vitaly Kushner**. This repository continues the project as an
+independent, detached fork with modernized tooling. The Ruby namespace and
+require path are unchanged:
+
+```ruby
+require "debitcredit"
+Debitcredit::Entry
+Debitcredit::Account
+```
 
 ## Installation
 
-* add `gem 'debitcredit'` to your `Gemfile`
-* and run `bundle install`
-* run `rake debitcredit:install:migrations db:migrate`
+Add the gem to your Gemfile:
 
-## Upgrade
+```ruby
+gem "debitcredit-ledger"
+```
 
-* and run `bundle update debitcredit`
-* run `rake debitcredit:install:migrations db:migrate`
+Then run:
 
-### IMPORTANT: version 0.2.0 introduced backwards incompatible changes:
+```sh
+bundle install
+bundle exec rake debitcredit:install:migrations db:migrate
+```
 
-Transactions were renamed to entries. You need to rename:
+The require path is still `require "debitcredit"`; only the distribution/gem
+name changed to `debitcredit-ledger`.
 
-* Transaction to Entry
-* transactions to entries
-* has_transactions to has_entries
+## Compatibility
+
+Declared bounds are **lower bounds only**:
+
+- Ruby `>= 4.0`
+- Rails `>= 8.0`
+
+There are no upper bounds. Later compatible versions remain installable. The
+GitHub Actions CI matrix defines the **verified** combinations:
+
+- Ruby 4.x with Rails 8.x
+- SQLite and PostgreSQL
+
+No MySQL support yet (tracked in
+[#2](https://github.com/dpaluy/debitcredit-ledger/issues/2)).
+
+## Supported databases
+
+Select the database with the `DB` environment variable (default `sqlite`):
+
+```sh
+DB=sqlite      bundle exec rake test
+DB=postgresql  bundle exec rake test
+```
+
+PostgreSQL uses `DATABASE_URL` or the `POSTGRES_HOST`, `POSTGRES_USER`,
+`POSTGRES_PASSWORD`, `POSTGRES_DB` environment variables.
+
+## Development
+
+```sh
+bundle install
+DB=sqlite bundle exec rake debitcredit:install:migrations
+DB=sqlite bundle exec rake db:migrate
+DB=sqlite bundle exec rake test      # fixture-backed Minitest
+DB=postgresql bundle exec rake test
+bundle exec rake style               # RuboCop, 0 offenses expected
+bundle exec rake dummy:boot          # Rails + Debitcredit boot check
+gem build debitcredit-ledger.gemspec # no warnings expected
+```
+
+Tests are fixture-backed Minitest. The test database is managed by a Rails 8
+API-only dummy app at `test/dummy`.
+
+See `AGENTS.md` and `skills/debitcredit-ledger/SKILL.md` for the agent contract
+and repository workflow.
+
+## Upgrade from the original vitaly/debitcredit
+
+If you are migrating from the original gem:
+
+1. Replace `gem "debitcredit"` with `gem "debitcredit-ledger"` in your Gemfile.
+2. The Ruby namespace (`Debitcredit`) and require path (`require "debitcredit"`)
+   are unchanged.
+3. Run `bundle exec rake debitcredit:install:migrations db:migrate` to pick up
+   any new migrations.
+
+> **Historical note:** version 0.2.0 of the original gem introduced
+> backwards-incompatible changes (transactions were renamed to entries:
+> `Transaction` → `Entry`, `transactions` → `entries`,
+> `has_transactions` → `has_entries`). This continuation starts at `1.0.0`.
 
 ## Account Types, Debits and Credits
 
@@ -54,8 +124,6 @@ income, membership fees, rent income, etc.
 from using the assets or increasing liabilities in delivering goods or services
 to a customer - the costs of doing business. e.g. telephone, electricity,
 salaries, depreciation, rent etc.
-
-
 
 Debit and credit affect balance of an account differently depending on the
 account type.
@@ -174,8 +242,8 @@ reference has 'accounts' association, you can use account names instead of objec
 You can prepare an inverse entry. For example if you want to rollback an
 existing entry:
 
-rollback = existing.inverse(kind: 'refund', description: 'item is out of stock')
-rollback.save!
+    rollback = existing.inverse(kind: 'refund', description: 'item is out of stock')
+    rollback.save!
 
 ### Overdraft
 
@@ -190,12 +258,13 @@ accounts with `overdraft_enabled: false`.  if this is undesirable, pass
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Bug reports and pull requests are welcome on
+[GitHub](https://github.com/dpaluy/debitcredit-ledger/issues).
 
-# License
+Deferred ledger-integrity hardening work is tracked in Issues
+[#2](https://github.com/dpaluy/debitcredit-ledger/issues/2)–[#8](https://github.com/dpaluy/debitcredit-ledger/issues/8).
 
-This project rocks and uses MIT-LICENSE.
+## License
+
+This project is released under the MIT License, preserving the original
+attribution to **Vitaly Kushner** (© 2018). See [`MIT-LICENSE`](./MIT-LICENSE).
