@@ -6,6 +6,9 @@ end
 
 APP_RAKEFILE = File.expand_path("test/dummy/Rakefile", __dir__)
 load "rails/tasks/engine.rake"
-load "rails/tasks/statistics.rake"
 
 require "bundler/gem_tasks"
+require "rake/testtask"
+
+# Top-level alias so `rake dummy:boot` works as documented in AGENTS.md/SKILL.md.
+task "dummy:boot" => "app:dummy:boot"

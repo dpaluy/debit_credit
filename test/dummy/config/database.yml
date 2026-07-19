@@ -1,0 +1,41 @@
+<% db = ENV.fetch("DB", "sqlite") %>
+
+<% if db == "postgresql" %>
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "") %>
+  database: <%= ENV.fetch("POSTGRES_DB", "debitcredit_test") %>
+<% else %>
+default: &default
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+<% end %>
+
+development:
+  <<: *default
+  <% if db == "postgresql" %>
+  database: <%= ENV.fetch("POSTGRES_DB", "debitcredit_test") %>_development
+  <% else %>
+  database: db/development.sqlite3
+  <% end %>
+
+test:
+  <<: *default
+  <% if db == "postgresql" %>
+  database: <%= ENV.fetch("POSTGRES_DB", "debitcredit_test") %>
+  <% else %>
+  database: db/test.sqlite3
+  <% end %>
+
+production:
+  <<: *default
+  <% if db == "postgresql" %>
+  database: <%= ENV.fetch("POSTGRES_DB", "debitcredit_test") %>_production
+  <% else %>
+  database: db/production.sqlite3
+  <% end %>
