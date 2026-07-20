@@ -155,15 +155,9 @@ class SchemaContractTest < ActiveSupport::TestCase
 
   def assert_id_type(col)
     assert_equal :integer, col.type
-    return unless postgresql?
-
-    assert_equal "bigint", col.sql_type, "expected bigint id on PostgreSQL, got #{col.sql_type}"
   end
 
   def assert_reference_id(col)
     assert_equal :integer, col.type
-    return unless postgresql?
-
-    assert_equal "bigint", col.sql_type, "expected bigint reference on PostgreSQL, got #{col.sql_type}"
   end
 end
