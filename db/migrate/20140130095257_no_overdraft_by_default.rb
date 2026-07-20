@@ -1,9 +1,0 @@
-class NoOverdraftByDefault < ActiveRecord::Migration[8.0]
-  def up
-    change_column_default :debit_credit_accounts, :overdraft_enabled, false
-  end
-
-  def down
-    change_column_default :debit_credit_accounts, :overdraft_enabled, true
-  end
-end

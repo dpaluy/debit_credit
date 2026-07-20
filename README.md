@@ -65,7 +65,9 @@ gem build debit_credit-ledger.gemspec # no warnings expected
 ```
 
 Tests are fixture-backed Minitest. The test database is managed by a Rails 8
-API-only dummy app at `test/dummy`.
+API-only dummy app at `test/dummy`. The gem ships exactly one Rails 8
+create-only migration; running `debit_credit:install:migrations` copies it
+into the host application.
 
 See `AGENTS.md` for repository guidance.
 
@@ -234,7 +236,7 @@ accounts with `overdraft_enabled: false`.  if this is undesirable, pass
 ## Contributing
 
 Bug reports and pull requests are welcome on
-[GitHub](https://github.com/dpaluy/debit_credit/issues).
+[GitHub](https://github.com/dpaluy/debit_credit-ledger/issues).
 
 ## License
 

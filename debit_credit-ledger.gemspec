@@ -13,12 +13,12 @@ Gem::Specification.new do |s|
                   "accounts (asset, liability, equity, income, expense), " \
                   "balanced entries, references, and inverse/rollback entries."
 
-  s.homepage = "https://github.com/dpaluy/debit_credit"
+  s.homepage = "https://github.com/dpaluy/debit_credit-ledger"
   s.metadata = {
-    "source_code_uri" => "https://github.com/dpaluy/debit_credit",
-    "bug_tracker_uri" => "https://github.com/dpaluy/debit_credit/issues",
-    "changelog_uri" => "https://github.com/dpaluy/debit_credit/blob/master/CHANGELOG.md",
-    "documentation_uri" => "https://github.com/dpaluy/debit_credit#readme",
+    "source_code_uri" => "https://github.com/dpaluy/debit_credit-ledger",
+    "bug_tracker_uri" => "https://github.com/dpaluy/debit_credit-ledger/issues",
+    "changelog_uri" => "https://github.com/dpaluy/debit_credit-ledger/blob/master/CHANGELOG.md",
+    "documentation_uri" => "https://github.com/dpaluy/debit_credit-ledger#readme",
     "rubygems_mfa_required" => "true"
   }
 
@@ -33,7 +33,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rubocop-minitest", "~> 0.39"
   s.add_development_dependency "sqlite3"
 
-  # Deterministic package contents. Excludes tests, CI, lockfile, built gems.
+  # Deterministic package contents. Excludes tests, CI, and built gems.
+  # Gemfile.lock is not tracked; Bundler generates an ephemeral lock when needed.
   s.files = Dir[
     "{app,config,db,lib}/**/*",
     "MIT-LICENSE",

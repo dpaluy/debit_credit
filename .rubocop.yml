@@ -14,9 +14,7 @@ AllCops:
     - "vendor/**/*"
     - "node_modules/**/*"
     - "pkg/**/*"
-    - "Gemfile.lock"
     - "*.gem"
-    - "db/migrate/**/*"        # historical migrations; preserve verbatim
     - "test/dummy/**/*"        # generated dummy app = test infrastructure
     - "bin/**/*"               # Rails-generated binstub
 
@@ -137,6 +135,12 @@ Metrics/BlockLength:
 
 Metrics/MethodLength:
   Max: 20
+  Exclude:
+    - "db/migrate/**/*.rb"
+
+Metrics/AbcSize:
+  Exclude:
+    - "db/migrate/**/*.rb"
 
 Metrics/ModuleLength:
   Max: 200

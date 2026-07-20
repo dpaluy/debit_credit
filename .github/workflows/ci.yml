@@ -50,8 +50,6 @@ jobs:
           RAILS_ENV=test bundle exec rake app:db:migrate
       - name: Test
         run: bundle exec rake test
-      - name: Naming contract
-        run: bundle exec rails test test/naming_contract_test.rb
 
   style:
     name: Style (RuboCop)
@@ -88,13 +86,19 @@ jobs:
         run: |
           ruby -e '
             require "rubygems/package"
+            spec = Gem::Package.new("debit_credit-ledger-1.0.0.gem").spec
             files = Gem::Package.new("debit_credit-ledger-1.0.0.gem").contents
-            excluded = files.select { |f| f.start_with?("test/", ".github/", "spec/", "pkg/") || f == "Gemfile.lock" || f.end_with?(".gem") }
+            excluded = files.select { |f| f.start_with?("test/", ".github/", "spec/", "pkg/") || f.end_with?(".gem") || f == "Gemfile.lock" }
             raise "Excluded paths in gem: #{excluded.inspect}" unless excluded.empty?
             required = %w[lib/debit_credit.rb lib/debit_credit/version.rb lib/debit_credit/engine.rb app/models/debit_credit/account.rb config/locales/en.yml MIT-LICENSE Rakefile README.md]
             missing = required - files
             raise "Missing required files: #{missing.inspect}" unless missing.empty?
-            puts "Package contents verified: #{files.size} files"
+            migrations = files.select { |f| f.start_with?("db/migrate/") }
+            raise "Expected exactly one migration, got: #{migrations.inspect}" unless migrations.size == 1
+            raise "Wrong migration: #{migrations.first}" unless migrations.first == "db/migrate/20260720000000_create_debit_credit_ledger.rb"
+            raise "Wrong homepage: #{spec.homepage}" unless spec.homepage == "https://github.com/dpaluy/debit_credit-ledger"
+            raise "Wrong source_code_uri" unless spec.metadata["source_code_uri"] == "https://github.com/dpaluy/debit_credit-ledger"
+            puts "Package contents verified: #{files.size} files, 1 migration"
           '
 
   install_smoke:
@@ -132,3 +136,29 @@ jobs:
             puts "DebitCredit::VERSION = #{DebitCredit::VERSION}"
             puts "DebitCredit::Engine = #{DebitCredit::Engine}"
           '
+      - name: Install-task smoke (exactly one migration, idempotent)
+        run: |
+          set -e
+          rm -rf /tmp/dc-host
+          mkdir -p /tmp/dc-host
+          cd /tmp/dc-host
+          bundle exec rails new . --skip-bundle --skip-git --minimal \
+            --skip-active-storage --skip-action-mailbox --skip-action-text \
+            --skip-action-cable --skip-sprockets --skip-bootsnap --force
+          echo "gem \"debit_credit-ledger\", path: \"$GITHUB_WORKSPACE\"" >> Gemfile
+          bundle install
+          bundle exec rails debit_credit:install:migrations
+          copied=$(ls -1 db/migrate/*.rb 2>/dev/null | wc -l)
+          if [ "$copied" -ne 1 ]; then
+            echo "Expected exactly 1 copied migration, got $copied"
+            ls -la db/migrate/
+            exit 1
+          fi
+          echo "Copied: $(basename db/migrate/*.rb)"
+          bundle exec rails debit_credit:install:migrations
+          recopied=$(ls -1 db/migrate/*.rb 2>/dev/null | wc -l)
+          if [ "$recopied" -ne 1 ]; then
+            echo "Second install: expected still 1 migration, got $recopied"
+            exit 1
+          fi
+          echo "Install task idempotent: 1 migration after second invocation"

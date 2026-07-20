@@ -4,7 +4,7 @@
 
 This repository packages `debit_credit-ledger`, a Rails engine for double-entry accounting. Runtime models live in `app/models/debit_credit/`; engine loading and version files live in `lib/debit_credit/`. Keep the public require path `require "debit_credit"` and the Ruby namespace `DebitCredit`. Database migrations are under `db/migrate/`, locale data under `config/locales/`, and Rake tasks under `lib/tasks/`.
 
-Tests live in `test/`, with model tests in `test/models/debit_credit/`, fixtures in `test/fixtures/`, shared helpers in `test/support/`, and the Rails host application in `test/dummy/`. Historical engine migrations are edited in place for this unreleased identity correction; preserve their timestamps and ordering. The gem is Rails 8-only, so every migration under `db/migrate/` and `test/dummy/db/migrate/` inherits `ActiveRecord::Migration[8.0]`; the naming contract enforces this.
+Tests live in `test/`, with model tests in `test/models/debit_credit/`, fixtures in `test/fixtures/`, shared helpers in `test/support/`, and the Rails host application in `test/dummy/`. The gem is Rails 8-only, so the single engine migration under `db/migrate/` and the dummy host migration under `test/dummy/db/migrate/` both inherit `ActiveRecord::Migration[8.0]`. The engine ships exactly one create-only migration that builds the final `debit_credit_accounts`, `debit_credit_entries`, and `debit_credit_items` schema directly; there is no historical migration chain, compatibility migration, or upgrade path because 1.0.0 is unreleased.
 
 ## Build, Test, and Development Commands
 
