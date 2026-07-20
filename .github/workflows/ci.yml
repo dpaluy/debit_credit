@@ -149,6 +149,7 @@ jobs:
             --skip-action-cable --skip-sprockets --skip-bootsnap --force
           echo "gem \"debit_credit-ledger\", path: \"$GITHUB_WORKSPACE\"" >> Gemfile
           bundle install
+          sed -i 's/^require "rails"/require "rails"\nrequire "debit_credit"/' config/application.rb
           bundle exec rails debit_credit:install:migrations
           copied=$(ls -1 db/migrate/*.rb 2>/dev/null | wc -l)
           if [ "$copied" -ne 1 ]; then
