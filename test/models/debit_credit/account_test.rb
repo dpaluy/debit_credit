@@ -1,56 +1,56 @@
 require "test_helper"
 
-module Debitcredit
+module DebitCredit
   class AccountTest < ActiveSupport::TestCase
-    # Fixtures: users(:john), users(:bill), debitcredit_accounts(:name).
-    def equipment = debitcredit_accounts(:equipment)
-    def rent = debitcredit_accounts(:rent)
-    def bank = debitcredit_accounts(:bank)
-    def amex = debitcredit_accounts(:amex)
-    def capital = debitcredit_accounts(:capital)
-    def salary = debitcredit_accounts(:salary)
+    # Fixtures: users(:john), users(:bill), debit_credit_accounts(:name).
+    def equipment = debit_credit_accounts(:equipment)
+    def rent = debit_credit_accounts(:rent)
+    def bank = debit_credit_accounts(:bank)
+    def amex = debit_credit_accounts(:amex)
+    def capital = debit_credit_accounts(:capital)
+    def salary = debit_credit_accounts(:salary)
 
     test ".by_kind finds account class by kind" do
-      assert_equal Debitcredit::AssetAccount, Debitcredit::Account.by_kind(:asset)
+      assert_equal DebitCredit::AssetAccount, DebitCredit::Account.by_kind(:asset)
     end
 
     test "fixtures are valid" do
-      assert_valid_fixtures(Debitcredit::Account, count: 6)
+      assert_valid_fixtures(DebitCredit::Account, count: 6)
     end
 
     test "[] finds account by name" do
-      assert_equal amex, Debitcredit::Account[:amex]
+      assert_equal amex, DebitCredit::Account[:amex]
     end
 
     test "[] finds account by name and kind" do
-      assert_equal amex, Debitcredit::Account[:amex, :liability]
+      assert_equal amex, DebitCredit::Account[:amex, :liability]
     end
 
     test "[] creates account if kind is provided and none exists" do
-      assert_difference -> { Debitcredit::Account.count }, 1 do
-        foo = Debitcredit::Account[:foo, :expense]
+      assert_difference -> { DebitCredit::Account.count }, 1 do
+        foo = DebitCredit::Account[:foo, :expense]
 
-        assert_instance_of Debitcredit::ExpenseAccount, foo
+        assert_instance_of DebitCredit::ExpenseAccount, foo
         assert_equal "foo", foo.name
         assert_equal 0, foo.balance
       end
     end
 
     test "[] raises NotFound if none exists and no kind provided" do
-      err = assert_raises(Debitcredit::Account::NotFound) { Debitcredit::Account[:foo] }
+      err = assert_raises(DebitCredit::Account::NotFound) { DebitCredit::Account[:foo] }
       assert_match(/not found/, err.message)
     end
 
     test "[] updates overdraft if different" do
       assert_not rent.overdraft_enabled?
-      Debitcredit::Account[:rent, :expense, true]
+      DebitCredit::Account[:rent, :expense, true]
 
       assert_predicate rent.reload, :overdraft_enabled?
     end
 
     test "[] raises BadKind on different kind" do
-      assert_raises(Debitcredit::Account::BadKind) do
-        Debitcredit::Account[:rent, :asset]
+      assert_raises(DebitCredit::Account::BadKind) do
+        DebitCredit::Account[:rent, :asset]
       end
     end
 
@@ -58,19 +58,19 @@ module Debitcredit
       foo = users(:john).accounts[:foo, :asset]
 
       assert_equal users(:john), foo.reference
-      assert_instance_of Debitcredit::AssetAccount, foo
+      assert_instance_of DebitCredit::AssetAccount, foo
       assert_equal "foo", foo.name
     end
 
     test ".balanced? is initially true" do
-      assert_predicate Debitcredit::Account, :balanced?
+      assert_predicate DebitCredit::Account, :balanced?
     end
 
     test ".balanced? is false if out of balance" do
       equipment.balance += 1
       equipment.save!
 
-      assert_not Debitcredit::Account.balanced?
+      assert_not DebitCredit::Account.balanced?
     end
 
     test ".balanced? A + Ex = L + E + I" do
@@ -89,14 +89,14 @@ module Debitcredit
       salary.balance += 8
       salary.save!
 
-      assert_predicate Debitcredit::Account, :balanced?
+      assert_predicate DebitCredit::Account, :balanced?
     end
   end
 
   # Overdraft-disabled behavior.
   class AccountOverdraftDisabledTest < ActiveSupport::TestCase
     def described_class
-      Debitcredit::AssetAccount
+      DebitCredit::AssetAccount
     end
 
     def valid_attrs
@@ -155,7 +155,7 @@ module Debitcredit
   # Overdraft-enabled behavior.
   class AccountOverdraftEnabledTest < ActiveSupport::TestCase
     def described_class
-      Debitcredit::AssetAccount
+      DebitCredit::AssetAccount
     end
 
     def valid_attrs

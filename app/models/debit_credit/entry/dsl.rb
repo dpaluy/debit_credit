@@ -1,4 +1,4 @@
-class Debitcredit::Entry::Dsl
+class DebitCredit::Entry::Dsl
   attr_accessor :entry
   attr_accessor :accounts
 

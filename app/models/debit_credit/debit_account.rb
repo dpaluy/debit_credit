@@ -1,4 +1,4 @@
-module Debitcredit
+module DebitCredit
   class DebitAccount < Account
     def debit(amount)
       self.balance += amount

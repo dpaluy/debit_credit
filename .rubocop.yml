@@ -1,5 +1,5 @@
 ---
-# Minimal RuboCop config for the debitcredit-ledger engine.
+# Minimal RuboCop config for the debit_credit-ledger engine.
 # Per the CI pitfall in the shaping handoff: GitHub Actions may install Bundler
 # dependencies under a repo-local vendor/bundle. Lint MUST NOT traverse vendored
 # dependencies or the generated dummy app, or CI will report thousands of
@@ -20,7 +20,7 @@ AllCops:
     - "test/dummy/**/*"        # generated dummy app = test infrastructure
     - "bin/**/*"               # Rails-generated binstub
 
-# The historical engine source (app/models/debitcredit/**, lib/debitcredit/**)
+# The historical engine source (app/models/debit_credit/**, lib/debit_credit/**)
 # predates this rubric and is preserved for behavioral fidelity. Lint the new
 # code (test/, Rakefile, gemspec) strictly; the engine keeps its original style.
 Style/Documentation:
@@ -35,8 +35,8 @@ Style/FrozenStringLiteralComment:
 Style/StringLiterals:
   EnforcedStyle: double_quotes
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
-    - "lib/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
+    - "lib/debit_credit/**/*.rb"
 
 Style/SymbolArray:
   EnforcedStyle: brackets
@@ -46,79 +46,79 @@ Style/ClassAndModuleChildren:
 
 Style/IfUnlessModifier:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/Alias:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/NumericPredicate:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/YodaCondition:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/CommentAnnotation:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/AccessorGrouping:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/OptionalBooleanParameter:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Layout/EmptyLinesAroundAttributeAccessor:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Layout/SpaceInsideHashLiteralBraces:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Layout/SpaceAroundOperators:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Layout/SpaceBeforeBlockBraces:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Layout/SpaceInsideBlockBraces:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Layout/EmptyLinesAfterModuleInclusion:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Lint/AssignmentInCondition:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Lint/NestedMethodDefinition:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Naming/PredicatePrefix:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Naming/BlockForwarding:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/ArgumentsForwarding:
   Exclude:
-    - "app/models/debitcredit/**/*.rb"
+    - "app/models/debit_credit/**/*.rb"
 
 Style/MutableConstant:
   Exclude:
-    - "lib/debitcredit/**/*.rb"
+    - "lib/debit_credit/**/*.rb"
 
 # Dev dependencies live in the gemspec (design choice), not the Gemfile.
 Gemspec/DevelopmentDependencies:

@@ -3,7 +3,7 @@
 # installed from the root of the application.
 
 ENGINE_ROOT = File.expand_path("..", __dir__)
-ENGINE_PATH = File.expand_path("../lib/debitcredit/engine", __dir__)
+ENGINE_PATH = File.expand_path("../lib/debit_credit/engine", __dir__)
 APP_PATH = File.expand_path("../test/dummy/config/application", __dir__)
 
 # Set up gems listed in the Gemfile.

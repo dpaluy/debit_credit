@@ -1,4 +1,4 @@
-module Debitcredit
+module DebitCredit
   class IncomeAccount < CreditAccount
   end
 end

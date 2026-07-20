@@ -1,19 +1,19 @@
 require "test_helper"
 
-module Debitcredit
+module DebitCredit
   class ItemTest < ActiveSupport::TestCase
     test "fixtures are valid" do
-      assert_valid_fixtures(Debitcredit::Item, count: 2)
+      assert_valid_fixtures(DebitCredit::Item, count: 2)
     end
 
     def described_class
-      Debitcredit::Item
+      DebitCredit::Item
     end
 
     def valid_attrs
       {
-        entry: debitcredit_entries(:laptop_purchase),
-        account: debitcredit_accounts(:equipment),
+        entry: debit_credit_entries(:laptop_purchase),
+        account: debit_credit_accounts(:equipment),
         debit: true,
         amount: 10
       }

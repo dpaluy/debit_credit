@@ -1,4 +1,4 @@
-module Debitcredit
+module DebitCredit
   class Item < ApplicationRecord
     belongs_to :entry
     belongs_to :account

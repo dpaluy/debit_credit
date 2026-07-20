@@ -2,8 +2,7 @@
 
 ## 1.0.0 (2026-07-18)
 
-- Renamed distribution/gem to `debitcredit-ledger`. Ruby namespace
-  (`Debitcredit`) and require path (`require "debitcredit"`) are unchanged.
+- The 1.0.0 identity uses the `debit_credit-ledger` distribution, the `DebitCredit` namespace, and the `require "debit_credit"` loader.
 - Requires Ruby `>= 4.0` and Rails `>= 8.0` (lower bounds only).
 - Test suite migrated from RSpec to fixture-backed Minitest under `test/`.
 - Added a Rails 8 API-only dummy app at `test/dummy`.

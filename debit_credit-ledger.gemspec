@@ -1,8 +1,8 @@
-require_relative "lib/debitcredit/version"
+require_relative "lib/debit_credit/version"
 
 Gem::Specification.new do |s|
-  s.name = "debitcredit-ledger"
-  s.version = Debitcredit::VERSION
+  s.name = "debit_credit-ledger"
+  s.version = DebitCredit::VERSION
 
   s.authors = ["David Paluy"]
   s.email = ["david@paluy.com"]
@@ -13,12 +13,12 @@ Gem::Specification.new do |s|
                   "accounts (asset, liability, equity, income, expense), " \
                   "balanced entries, references, and inverse/rollback entries."
 
-  s.homepage = "https://github.com/dpaluy/debitcredit-ledger"
+  s.homepage = "https://github.com/dpaluy/debit_credit"
   s.metadata = {
-    "source_code_uri" => "https://github.com/dpaluy/debitcredit-ledger",
-    "bug_tracker_uri" => "https://github.com/dpaluy/debitcredit-ledger/issues",
-    "changelog_uri" => "https://github.com/dpaluy/debitcredit-ledger/blob/master/CHANGELOG.md",
-    "documentation_uri" => "https://github.com/dpaluy/debitcredit-ledger#readme",
+    "source_code_uri" => "https://github.com/dpaluy/debit_credit",
+    "bug_tracker_uri" => "https://github.com/dpaluy/debit_credit/issues",
+    "changelog_uri" => "https://github.com/dpaluy/debit_credit/blob/master/CHANGELOG.md",
+    "documentation_uri" => "https://github.com/dpaluy/debit_credit#readme",
     "rubygems_mfa_required" => "true"
   }
 

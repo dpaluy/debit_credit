@@ -1,11 +1,11 @@
 require "test_helper"
 
-module Debitcredit
+module DebitCredit
   class ExtensionTest < ActiveSupport::TestCase
     test "has_accounts defines methods that create accounts" do
       acc = users(:john).accounts.cash
 
-      assert_instance_of Debitcredit::AssetAccount, acc
+      assert_instance_of DebitCredit::AssetAccount, acc
       assert_equal users(:john).accounts[:cash], acc
     end
 
@@ -14,7 +14,7 @@ module Debitcredit
     end
 
     test "has_entries defines []" do
-      assert_equal debitcredit_entries(:laptop_purchase), users(:john).entries[:purchase]
+      assert_equal debit_credit_entries(:laptop_purchase), users(:john).entries[:purchase]
     end
 
     test "has_entries allows defining methods" do

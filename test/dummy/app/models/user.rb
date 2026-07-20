@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  include Debitcredit::Extension
+  include DebitCredit::Extension
 
   has_accounts do
     asset :cash

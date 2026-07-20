@@ -1,8 +1,8 @@
 require "active_support/core_ext/module/delegation"
 require "action_dispatch"
 require "rails/engine"
-require_relative "debitcredit/version"
-require_relative "debitcredit/engine"
+require_relative "debit_credit/version"
+require_relative "debit_credit/engine"
 
-module Debitcredit
+module DebitCredit
 end

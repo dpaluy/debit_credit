@@ -1,4 +1,4 @@
-module Debitcredit
+module DebitCredit
   class CreditAccount < Account
     def debit(amount)
       self.balance -= amount

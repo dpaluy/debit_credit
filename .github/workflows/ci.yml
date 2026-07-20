@@ -21,7 +21,7 @@ jobs:
       POSTGRES_HOST: localhost
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: debitcredit_test
+      POSTGRES_DB: debit_credit_test
     services:
       postgres:
         image: postgres:16
@@ -29,7 +29,7 @@ jobs:
           POSTGRES_HOST: localhost
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: debitcredit_test
+          POSTGRES_DB: debit_credit_test
         ports:
           - 5432:5432
         options: >-
@@ -50,6 +50,8 @@ jobs:
           RAILS_ENV=test bundle exec rake app:db:migrate
       - name: Test
         run: bundle exec rake test
+      - name: Naming contract
+        run: bundle exec rails test test/naming_contract_test.rb
 
   style:
     name: Style (RuboCop)
@@ -80,16 +82,16 @@ jobs:
           bundler-cache: true
       - name: Build gem
         run: |
-          gem build debitcredit-ledger.gemspec
-          test -f debitcredit-ledger-1.0.0.gem
+          gem build debit_credit-ledger.gemspec
+          test -f debit_credit-ledger-1.0.0.gem
       - name: Verify package contents
         run: |
           ruby -e '
             require "rubygems/package"
-            files = Gem::Package.new("debitcredit-ledger-1.0.0.gem").contents
+            files = Gem::Package.new("debit_credit-ledger-1.0.0.gem").contents
             excluded = files.select { |f| f.start_with?("test/", ".github/", "spec/", "pkg/") || f == "Gemfile.lock" || f.end_with?(".gem") }
             raise "Excluded paths in gem: #{excluded.inspect}" unless excluded.empty?
-            required = %w[lib/debitcredit.rb lib/debitcredit/version.rb lib/debitcredit/engine.rb app/models/debitcredit/account.rb config/locales/en.yml MIT-LICENSE Rakefile README.md]
+            required = %w[lib/debit_credit.rb lib/debit_credit/version.rb lib/debit_credit/engine.rb app/models/debit_credit/account.rb config/locales/en.yml MIT-LICENSE Rakefile README.md]
             missing = required - files
             raise "Missing required files: #{missing.inspect}" unless missing.empty?
             puts "Package contents verified: #{files.size} files"
@@ -108,24 +110,25 @@ jobs:
           ruby-version: "4.0"
           bundler-cache: true
       - name: Build gem
-        run: gem build debitcredit-ledger.gemspec
+        run: gem build debit_credit-ledger.gemspec
       - name: Install into throwaway GEM_HOME
         run: |
-          rm -rf /tmp/dc-gemhouse /tmp/debitcredit-install-smoke
-          mkdir -p /tmp/debitcredit-install-smoke
-          gem install --install-dir /tmp/dc-gemhouse --no-document "$GITHUB_WORKSPACE/debitcredit-ledger-1.0.0.gem"
+          rm -rf /tmp/debit_credit-gemhome /tmp/debit_credit-install-smoke
+          mkdir -p /tmp/debit_credit-install-smoke
+          gem install --install-dir /tmp/debit_credit-gemhome --no-document "$GITHUB_WORKSPACE/debit_credit-ledger-1.0.0.gem"
       - name: Require smoke
-        working-directory: /tmp/debitcredit-install-smoke
+        working-directory: /tmp/debit_credit-install-smoke
         run: |
-          GEM_HOME=/tmp/dc-gemhouse GEM_PATH=/tmp/dc-gemhouse ruby -e '
-            require "debitcredit"
-            raise "VERSION mismatch" unless Debitcredit::VERSION == "1.0.0"
-            loaded_path = Gem.loaded_specs.fetch("debitcredit-ledger").full_gem_path
+          env -u BUNDLE_GEMFILE -u BUNDLE_BIN_PATH -u RUBYLIB -u RUBYOPT \
+            GEM_HOME=/tmp/debit_credit-gemhome GEM_PATH=/tmp/debit_credit-gemhome ruby -e '
+            require "debit_credit"
+            raise "VERSION mismatch" unless DebitCredit::VERSION == "1.0.0"
+            loaded_path = Gem.loaded_specs.fetch("debit_credit-ledger").full_gem_path
             raise "checkout source loaded: #{loaded_path}" if loaded_path == ENV.fetch("GITHUB_WORKSPACE")
             raise "unexpected loaded path: #{loaded_path}" unless loaded_path.start_with?(ENV.fetch("GEM_HOME"))
-            debitcredit_file = $LOADED_FEATURES.find { |path| path.end_with?("/debitcredit.rb") }
-            raise "unexpected debitcredit file: #{debitcredit_file}" unless debitcredit_file&.start_with?(loaded_path)
-            puts "Loaded debitcredit-ledger from #{loaded_path}"
-            puts "Debitcredit::VERSION = #{Debitcredit::VERSION}"
-            puts "Debitcredit::Engine = #{Debitcredit::Engine}"
+            debit_credit_file = $LOADED_FEATURES.find { |path| path.end_with?("/debit_credit.rb") }
+            raise "unexpected debit_credit file: #{debit_credit_file}" unless debit_credit_file&.start_with?(loaded_path)
+            puts "Loaded debit_credit-ledger from #{loaded_path}"
+            puts "DebitCredit::VERSION = #{DebitCredit::VERSION}"
+            puts "DebitCredit::Engine = #{DebitCredit::Engine}"
           '

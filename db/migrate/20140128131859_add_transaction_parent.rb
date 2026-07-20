@@ -1,6 +1,6 @@
 class AddTransactionParent < ActiveRecord::Migration[4.2]
   def change
-    add_column :debitcredit_transactions, :parent_transaction_id, :integer
-    add_index :debitcredit_transactions, [:parent_transaction_id]
+    add_column :debit_credit_transactions, :parent_transaction_id, :integer
+    add_index :debit_credit_transactions, [:parent_transaction_id]
   end
 end

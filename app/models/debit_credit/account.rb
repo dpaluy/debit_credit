@@ -1,5 +1,5 @@
 require 'docile'
-module Debitcredit
+module DebitCredit
   class Account < ApplicationRecord
     belongs_to :reference, polymorphic: true, optional: true
     has_many :items, dependent: :destroy
@@ -19,7 +19,7 @@ module Debitcredit
     class BadKind < StandardError; end
     class << self
       def by_kind(kind)
-        Debitcredit.const_get "#{kind.to_s.capitalize}Account"
+        DebitCredit.const_get "#{kind.to_s.capitalize}Account"
       end
 
       def find_or_create(name, kind = nil, overdraft = false)

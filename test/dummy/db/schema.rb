@@ -11,7 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2015_01_06_165647) do
-  create_table "debitcredit_accounts", force: :cascade do |t|
+  create_table "debit_credit_accounts", force: :cascade do |t|
     t.decimal "balance", precision: 20, scale: 2, default: "0.0", null: false
     t.datetime "created_at", precision: nil
     t.string "name", limit: 32, null: false
@@ -20,10 +20,10 @@ ActiveRecord::Schema[8.1].define(version: 2015_01_06_165647) do
     t.string "reference_type", limit: 32
     t.string "type", limit: 32, null: false
     t.datetime "updated_at", precision: nil
-    t.index ["name", "reference_id", "reference_type"], name: "uindex", unique: true
+    t.index ["name", "reference_id", "reference_type"], name: "index_debit_credit_accounts_on_name_and_reference", unique: true
   end
 
-  create_table "debitcredit_entries", force: :cascade do |t|
+  create_table "debit_credit_entries", force: :cascade do |t|
     t.datetime "created_at", precision: nil
     t.string "description", null: false
     t.integer "inverse_entry_id"
@@ -32,11 +32,11 @@ ActiveRecord::Schema[8.1].define(version: 2015_01_06_165647) do
     t.integer "reference_id"
     t.string "reference_type", limit: 32
     t.datetime "updated_at", precision: nil
-    t.index ["parent_entry_id"], name: "index_debitcredit_entries_on_parent_entry_id"
-    t.index ["reference_id", "reference_type", "id"], name: "rindex"
+    t.index ["parent_entry_id"], name: "index_debit_credit_entries_on_parent_entry_id"
+    t.index ["reference_id", "reference_type", "id"], name: "index_debit_credit_entries_on_reference"
   end
 
-  create_table "debitcredit_items", force: :cascade do |t|
+  create_table "debit_credit_items", force: :cascade do |t|
     t.integer "account_id", null: false
     t.decimal "amount", precision: 20, scale: 2, default: "0.0", null: false
     t.decimal "balance", precision: 20, scale: 2, default: "0.0", null: false
@@ -45,8 +45,8 @@ ActiveRecord::Schema[8.1].define(version: 2015_01_06_165647) do
     t.boolean "debit", null: false
     t.integer "entry_id", null: false
     t.datetime "updated_at", precision: nil
-    t.index ["account_id"], name: "index_debitcredit_items_on_account_id"
-    t.index ["entry_id"], name: "index_debitcredit_items_on_entry_id"
+    t.index ["account_id"], name: "index_debit_credit_items_on_account_id"
+    t.index ["entry_id"], name: "index_debit_credit_items_on_entry_id"
   end
 
   create_table "users", force: :cascade do |t|

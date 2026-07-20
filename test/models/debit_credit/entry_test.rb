@@ -1,29 +1,29 @@
 require "test_helper"
 
-module Debitcredit
+module DebitCredit
   class EntryTest < ActiveSupport::TestCase
     def valid_attrs
       { description: "something", reference: users(:john) }
     end
 
-    def equipment = debitcredit_accounts(:equipment)
-    def bank = debitcredit_accounts(:bank)
-    def amex = debitcredit_accounts(:amex)
-    def rent = debitcredit_accounts(:rent)
-    def capital = debitcredit_accounts(:capital)
+    def equipment = debit_credit_accounts(:equipment)
+    def bank = debit_credit_accounts(:bank)
+    def amex = debit_credit_accounts(:amex)
+    def rent = debit_credit_accounts(:rent)
+    def capital = debit_credit_accounts(:capital)
 
     def entry
-      debitcredit_entries(:laptop_purchase)
+      debit_credit_entries(:laptop_purchase)
     end
 
     def prepare(opts = {}, &)
-      @r = Debitcredit::Entry.prepare(valid_attrs.merge(opts), &)
+      @r = DebitCredit::Entry.prepare(valid_attrs.merge(opts), &)
     end
 
     # ---- validations ----
 
     test "fixtures are valid" do
-      assert_valid_fixtures(Debitcredit::Entry)
+      assert_valid_fixtures(DebitCredit::Entry)
     end
 
     test "sets kind" do
@@ -78,7 +78,7 @@ module Debitcredit
     end
 
     test "locks and updates account balances after validation" do
-      amex2 = Debitcredit::Account[:amex]
+      amex2 = DebitCredit::Account[:amex]
 
       assert_equal 10_000, equipment.balance
       assert_equal 100_000, bank.balance

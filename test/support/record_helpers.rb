@@ -1,7 +1,7 @@
 module RecordHelpers
   # Default class under test. Override `described_class` in each test case.
   def described_class
-    Debitcredit::AssetAccount
+    DebitCredit::AssetAccount
   end
 
   # Default valid attributes for building records. Override per test case.

@@ -1,29 +1,29 @@
-# debitcredit-ledger
+# debit_credit-ledger
 
 Double-entry accounting for Rails applications.
 
 ```ruby
-require "debitcredit"
-Debitcredit::Entry
-Debitcredit::Account
+require "debit_credit"
+DebitCredit::Entry
+DebitCredit::Account
 ```
 
-The distribution/gem name is `debitcredit-ledger`; the Ruby namespace is
-`Debitcredit` and the require path is `require "debitcredit"`.
+The distribution/gem name is `debit_credit-ledger`; the Ruby namespace is
+`DebitCredit` and the require path is `require "debit_credit"`.
 
 ## Installation
 
 Add the gem to your Gemfile:
 
 ```ruby
-gem "debitcredit-ledger"
+gem "debit_credit-ledger"
 ```
 
 Then run:
 
 ```sh
 bundle install
-bundle exec rake debitcredit:install:migrations db:migrate
+bin/rails debit_credit:install:migrations db:migrate
 ```
 
 ## Compatibility
@@ -55,13 +55,13 @@ PostgreSQL uses `DATABASE_URL` or the `POSTGRES_HOST`, `POSTGRES_USER`,
 
 ```sh
 bundle install
-DB=sqlite bundle exec rake debitcredit:install:migrations
+DB=sqlite bundle exec rake debit_credit:install:migrations
 DB=sqlite bundle exec rake db:migrate
 DB=sqlite bundle exec rake test      # fixture-backed Minitest
 DB=postgresql bundle exec rake test
 bundle exec rake style               # RuboCop, 0 offenses expected
-bundle exec rake dummy:boot          # Rails + Debitcredit boot check
-gem build debitcredit-ledger.gemspec # no warnings expected
+bundle exec rake dummy:boot          # Rails + DebitCredit boot check
+gem build debit_credit-ledger.gemspec # no warnings expected
 ```
 
 Tests are fixture-backed Minitest. The test database is managed by a Rails 8
@@ -127,27 +127,27 @@ At any given point accounts should satisfy the following equation:
 
 You can verify it with `Account.balanced?`.
 
-Debitcredit takes care to keep the system balanced at all times, if you get an
+DebitCredit takes care to keep the system balanced at all times, if you get an
 unbalanced state, its a bug, please report immediately!
 
 ## Accounts
 
-The 5 types of accounts are represented by `Debitcredit::AssetAccount`,
-`Debitcredit::LiabilityAccount`, `Debitcredit::IncomeAccount`, `Debitcredit::ExpenseAccount` and `Debitcredit::EquityAccount`
+The 5 types of accounts are represented by `DebitCredit::AssetAccount`,
+`DebitCredit::LiabilityAccount`, `DebitCredit::IncomeAccount`, `DebitCredit::ExpenseAccount` and `DebitCredit::EquityAccount`
 
 You can create standalone accounts:
 
-    Debitcredit::AssetAccount.create name: 'asset'
-    puts Debitcredit::Account[:asset].name
+    DebitCredit::AssetAccount.create name: 'asset'
+    puts DebitCredit::Account[:asset].name
 
 Or you can have a reference for the account:
 
-    Debitcredit::AssetAccount.create name: 'asset', reference: User.first
+    DebitCredit::AssetAccount.create name: 'asset', reference: User.first
 
 Or
 
     class User
-      has_many :accounts, as: :reference, class_name: 'Debitcredit::Account'
+      has_many :accounts, as: :reference, class_name: 'DebitCredit::Account'
       ...
     end
 
@@ -157,7 +157,7 @@ Or
 Or better yet:
 
     class User
-      include Debitcredit::Extension
+      include DebitCredit::Extension
 
       has_accounts
     end
@@ -165,12 +165,12 @@ Or better yet:
 By default accounts are prevented from having a negative balance, but you can
 pass `overdraft_enabled: false` to allow it:
 
-    Debitcredit::AssetAccount.create ..., overdraft_enabled: true
+    DebitCredit::AssetAccount.create ..., overdraft_enabled: true
 
 You can pass a block to `has_accounts` and to define referenced accounts:
 
     class User
-      include Debitcredit::Extension
+      include DebitCredit::Extension
 
       has_accounts do
         income :salary
@@ -199,7 +199,7 @@ You can create entries with a reference. For this case, and in case that
 reference has 'accounts' association, you can use account names instead of objects:
 
     class User
-      include Debitcredit::Extension
+      include DebitCredit::Extension
 
       has_accounts
       has_entries do
@@ -234,7 +234,7 @@ accounts with `overdraft_enabled: false`.  if this is undesirable, pass
 ## Contributing
 
 Bug reports and pull requests are welcome on
-[GitHub](https://github.com/dpaluy/debitcredit-ledger/issues).
+[GitHub](https://github.com/dpaluy/debit_credit/issues).
 
 ## License
 

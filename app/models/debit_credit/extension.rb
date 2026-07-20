@@ -1,4 +1,4 @@
-module Debitcredit
+module DebitCredit
   module Extension
     extend ActiveSupport::Concern
     module ProxyMethods
@@ -13,7 +13,7 @@ module Debitcredit
 
     class_methods do
       def has_accounts(&block)
-        has_many :accounts, as: :reference, class_name: 'Debitcredit::Account', inverse_of: :reference do
+        has_many :accounts, as: :reference, class_name: 'DebitCredit::Account', inverse_of: :reference do
           extend ProxyMethods
           def [](name, kind = nil, overdraft = false)
             find_or_create(name, kind, overdraft)
@@ -23,7 +23,7 @@ module Debitcredit
       end
 
       def has_entries(&block)
-        has_many :entries, as: :reference, class_name: 'Debitcredit::Entry' do
+        has_many :entries, as: :reference, class_name: 'DebitCredit::Entry' do
           def [](kind)
             find_by kind: kind
           end

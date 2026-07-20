@@ -1,35 +1,35 @@
 equipment:
   name: 'equipment'
-  type: Debitcredit::AssetAccount
+  type: DebitCredit::AssetAccount
   balance: 10_000
   reference: john (User)
 
 rent:
   name: 'rent'
-  type: Debitcredit::ExpenseAccount
+  type: DebitCredit::ExpenseAccount
   balance: 0
   reference: john (User)
 
 bank:
   name: 'bank'
-  type: Debitcredit::AssetAccount
+  type: DebitCredit::AssetAccount
   balance: 100_000
   reference: john (User)
 
 salary:
   name: 'salary'
-  type: Debitcredit::IncomeAccount
+  type: DebitCredit::IncomeAccount
   balance: 0
   reference: john (User)
 
 amex:
   name: 'amex'
-  type: Debitcredit::LiabilityAccount
+  type: DebitCredit::LiabilityAccount
   balance: 10_000
   reference: john (User)
 
 capital:
   name: 'capital'
-  type: Debitcredit::EquityAccount
+  type: DebitCredit::EquityAccount
   balance: 100_000
   reference: john (User)
