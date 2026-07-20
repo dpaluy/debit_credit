@@ -1,4 +1,4 @@
-class CreateDebitCreditAccounts < ActiveRecord::Migration[4.2]
+class CreateDebitCreditAccounts < ActiveRecord::Migration[8.0]
   def change
     create_table :debit_credit_accounts do |t|
       t.string  :name,           null: false, limit:     16

@@ -78,6 +78,23 @@ class NamingContractTest < ActiveSupport::TestCase
     assert_includes dummy_application, 'require "debit_credit"'
   end
 
+  # The gem targets Rails 8 only (gemspec: rails >= 8.0, dummy app: Rails 8.1).
+  # Every tracked migration must declare its Rails migration version so the
+  # schema dumper and migrator run under consistent semantics. Legacy [4.2]
+  # declarations are not permitted on tracked migrations.
+  def test_every_tracked_migration_inherits_rails_eight_version
+    expected = "ActiveRecord::Migration[8.0]"
+    migrations = tracked_paths.select { |path| path.start_with?("db/migrate/", "test/dummy/db/migrate/") }
+
+    refute_empty migrations, "no tracked migrations discovered"
+
+    stale = migrations.reject do |path|
+      File.read(File.join(repository_root, path)).include?(expected)
+    end
+
+    assert_empty stale, "migrations missing #{expected}: #{stale.inspect}"
+  end
+
   private
 
   def tracked_paths

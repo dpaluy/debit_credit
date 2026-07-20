@@ -1,4 +1,4 @@
-class LongerAccountName < ActiveRecord::Migration[4.2]
+class LongerAccountName < ActiveRecord::Migration[8.0]
   def up
     change_column :debit_credit_accounts, :name, :string, limit: 32, null: false
   end
