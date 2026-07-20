@@ -142,7 +142,9 @@ jobs:
           rm -rf /tmp/dc-host
           mkdir -p /tmp/dc-host
           cd /tmp/dc-host
-          rails new . --skip-bundle --skip-git \
+          printf 'source "https://rubygems.org"\ngem "rails", ">= 8.0"\n' > Gemfile
+          bundle install
+          bundle exec rails new . --skip-bundle --skip-git \
             --skip-active-storage --skip-action-mailbox --skip-action-text \
             --skip-action-cable --skip-sprockets --skip-bootsnap --force
           echo "gem \"debit_credit-ledger\", path: \"$GITHUB_WORKSPACE\"" >> Gemfile
