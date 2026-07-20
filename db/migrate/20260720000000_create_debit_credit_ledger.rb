@@ -3,24 +3,26 @@ class CreateDebitCreditLedger < ActiveRecord::Migration[8.0]
     create_table :debit_credit_accounts do |t|
       t.string  :name, null: false, limit: 32
       t.string  :type, null: false, limit: 32
-      t.references :reference, polymorphic: true, null: true, index: false
+      t.references :reference, polymorphic: { limit: 32 }, type: :bigint,
+                               null: true, index: false
       t.decimal :balance, null: false, precision: 20, scale: 2, default: 0
       t.boolean :overdraft_enabled, null: false, default: false
       t.timestamps
     end
 
     create_table :debit_credit_entries do |t|
-      t.references :reference, polymorphic: true, null: true, index: false
+      t.references :reference, polymorphic: { limit: 32 }, type: :bigint,
+                               null: true, index: false
       t.string :kind, null: true
       t.string :description, null: false
-      t.references :parent_entry, null: true, foreign_key: false, index: false
-      t.references :inverse_entry, null: true, foreign_key: false, index: false
+      t.references :parent_entry, type: :bigint, null: true, foreign_key: false, index: false
+      t.references :inverse_entry, type: :bigint, null: true, foreign_key: false, index: false
       t.timestamps
     end
 
     create_table :debit_credit_items do |t|
-      t.references :entry, null: false, foreign_key: false, index: false
-      t.references :account, null: false, foreign_key: false, index: false
+      t.references :entry, type: :bigint, null: false, foreign_key: false, index: false
+      t.references :account, type: :bigint, null: false, foreign_key: false, index: false
       t.boolean :debit, null: false
       t.string :comment, null: true
       t.decimal :amount, null: false, precision: 20, scale: 2, default: 0

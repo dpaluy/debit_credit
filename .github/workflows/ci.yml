@@ -136,20 +136,37 @@ jobs:
             puts "DebitCredit::VERSION = #{DebitCredit::VERSION}"
             puts "DebitCredit::Engine = #{DebitCredit::Engine}"
           '
-      - name: Install-task smoke (exactly one migration, idempotent)
+      - name: Install-task smoke (installed gem, exactly one migration, idempotent)
         run: |
           set -e
           rm -rf /tmp/dc-host
           mkdir -p /tmp/dc-host
           cd /tmp/dc-host
+          # Unpack the built gem artifact to a directory outside the checkout so
+          # the neutral host loads the packaged artifact, never the checkout source.
+          gem unpack "$GITHUB_WORKSPACE/debit_credit-ledger-1.0.0.gem" --target /tmp/dc-gem-unpacked
           printf 'source "https://rubygems.org"\ngem "rails", ">= 8.0"\n' > Gemfile
           bundle install
           bundle exec rails new . --skip-bundle --skip-git \
             --skip-active-storage --skip-action-mailbox --skip-action-text \
             --skip-action-cable --skip-sprockets --skip-bootsnap --force
-          echo "gem \"debit_credit-ledger\", path: \"$GITHUB_WORKSPACE\"" >> Gemfile
+          echo "gem \"debit_credit-ledger\", path: \"/tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0\"" >> Gemfile
           bundle install
           sed -i 's/^require "rails"/require "rails"\nrequire "debit_credit"/' config/application.rb
+          # Assert the loaded gem/feature path resolves outside the checkout,
+          # proving the host uses the packaged artifact rather than $GITHUB_WORKSPACE.
+          bundle exec ruby -e '
+            require "debit_credit"
+            loaded_path = Gem.loaded_specs.fetch("debit_credit-ledger").full_gem_path
+            workspace = ENV.fetch("GITHUB_WORKSPACE")
+            raise "checkout source loaded: #{loaded_path}" if loaded_path == workspace
+            raise "loaded gem inside checkout: #{loaded_path}" if loaded_path.start_with?(workspace + "/")
+            raise "expected unpacked artifact path, got #{loaded_path}" unless loaded_path == "/tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0"
+            debit_credit_file = $LOADED_FEATURES.find { |path| path.end_with?("/debit_credit.rb") }
+            raise "loaded feature from checkout: #{debit_credit_file}" if debit_credit_file&.start_with?(workspace)
+            raise "unexpected debit_credit file: #{debit_credit_file}" unless debit_credit_file&.start_with?(loaded_path)
+            puts "Install-task host loaded debit_credit-ledger from #{loaded_path}"
+          '
           bundle exec rails debit_credit:install:migrations
           copied=$(ls -1 db/migrate/*.rb 2>/dev/null | wc -l)
           if [ "$copied" -ne 1 ]; then
