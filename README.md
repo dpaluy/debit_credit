@@ -1,28 +1,75 @@
-# Debitcredit
+# debit_credit-ledger
 
-[![Build Status](https://travis-ci.org/vitaly/debitcredit.png)](https://travis-ci.org/vitaly/debitcredit)
-[![Code Climate](https://codeclimate.com/github/vitaly/debitcredit.png)](https://codeclimate.com/github/vitaly/debitcredit)
+Double-entry accounting for Rails applications.
 
-Double Entry Accounting for Rails Applications
+```ruby
+require "debit_credit"
+DebitCredit::Entry
+DebitCredit::Account
+```
+
+The distribution/gem name is `debit_credit-ledger`; the Ruby namespace is
+`DebitCredit` and the require path is `require "debit_credit"`.
 
 ## Installation
 
-* add `gem 'debitcredit'` to your `Gemfile`
-* and run `bundle install`
-* run `rake debitcredit:install:migrations db:migrate`
+Add the gem to your Gemfile:
 
-## Upgrade
+```ruby
+gem "debit_credit-ledger"
+```
 
-* and run `bundle update debitcredit`
-* run `rake debitcredit:install:migrations db:migrate`
+Then run:
 
-### IMPORTANT: version 0.2.0 introduced backwards incompatible changes:
+```sh
+bundle install
+bin/rails debit_credit:install:migrations db:migrate
+```
 
-Transactions were renamed to entries. You need to rename:
+## Compatibility
 
-* Transaction to Entry
-* transactions to entries
-* has_transactions to has_entries
+Declared bounds are **lower bounds only**:
+
+- Ruby `>= 4.0`
+- Rails `>= 8.0`
+
+There are no upper bounds. Later compatible versions remain installable. The
+GitHub Actions CI matrix defines the **verified** combinations:
+
+- Ruby 4.x with Rails 8.x
+- SQLite and PostgreSQL
+
+## Supported databases
+
+Select the database with the `DB` environment variable (default `sqlite`):
+
+```sh
+DB=sqlite      bundle exec rake test
+DB=postgresql  bundle exec rake test
+```
+
+PostgreSQL uses `DATABASE_URL` or the `POSTGRES_HOST`, `POSTGRES_USER`,
+`POSTGRES_PASSWORD`, `POSTGRES_DB` environment variables.
+
+## Development
+
+```sh
+bundle install
+DB=sqlite bundle exec rake debit_credit:install:migrations
+DB=sqlite bundle exec rake db:migrate
+DB=sqlite bundle exec rake test      # fixture-backed Minitest
+DB=postgresql bundle exec rake test
+bundle exec rake style               # RuboCop, 0 offenses expected
+bundle exec rake dummy:boot          # Rails + DebitCredit boot check
+gem build debit_credit-ledger.gemspec # no warnings expected
+```
+
+Tests are fixture-backed Minitest. The test database is managed by a Rails 8
+API-only dummy app at `test/dummy`. The gem ships exactly one Rails 8
+create-only migration; running `debit_credit:install:migrations` copies it
+into the host application.
+
+See `AGENTS.md` for repository guidance.
 
 ## Account Types, Debits and Credits
 
@@ -41,8 +88,8 @@ owes to others.
 the assets of that business/entity. e.g. capital, retained earnings, drawings,
 common stock, accumulated funds, etc.
 
-**Income** is increases in economic benefits during the accounting period in
-the form of inflows or enhancements of assets or decreases of liabilities that
+**Income** is increases in economic benefits during the accounting period in the
+form of inflows or enhancements of assets or decreases of liabilities that
 result in increases in equity, other than those relating to contributions from
 equity participants.
 
@@ -54,8 +101,6 @@ income, membership fees, rent income, etc.
 from using the assets or increasing liabilities in delivering goods or services
 to a customer - the costs of doing business. e.g. telephone, electricity,
 salaries, depreciation, rent etc.
-
-
 
 Debit and credit affect balance of an account differently depending on the
 account type.
@@ -84,27 +129,27 @@ At any given point accounts should satisfy the following equation:
 
 You can verify it with `Account.balanced?`.
 
-Debitcredit takes care to keep the system balanced at all times, if you get an
+DebitCredit takes care to keep the system balanced at all times, if you get an
 unbalanced state, its a bug, please report immediately!
 
 ## Accounts
 
-The 5 types of accounts are represented by `Debitcredit::AssetAccount`,
-`Debitcredit::LiabilityAccount`, `Debitcredit::IncomeAccount`, `Debitcredit::ExpenseAccount` and `Debitcredit::EquityAccount`
+The 5 types of accounts are represented by `DebitCredit::AssetAccount`,
+`DebitCredit::LiabilityAccount`, `DebitCredit::IncomeAccount`, `DebitCredit::ExpenseAccount` and `DebitCredit::EquityAccount`
 
 You can create standalone accounts:
 
-    Debitcredit::AssetAccount.create name: 'asset'
-    puts Debitcredit::Account[:asset].name
+    DebitCredit::AssetAccount.create name: 'asset'
+    puts DebitCredit::Account[:asset].name
 
 Or you can have a reference for the account:
 
-    Debitcredit::AssetAccount.create name: 'asset', reference: User.first
+    DebitCredit::AssetAccount.create name: 'asset', reference: User.first
 
 Or
 
     class User
-      has_many :accounts, as: :reference, class_name: 'Debitcredit::Account'
+      has_many :accounts, as: :reference, class_name: 'DebitCredit::Account'
       ...
     end
 
@@ -114,7 +159,7 @@ Or
 Or better yet:
 
     class User
-      include Debitcredit::Extension
+      include DebitCredit::Extension
 
       has_accounts
     end
@@ -122,12 +167,12 @@ Or better yet:
 By default accounts are prevented from having a negative balance, but you can
 pass `overdraft_enabled: false` to allow it:
 
-    Debitcredit::AssetAccount.create ..., overdraft_enabled: true
+    DebitCredit::AssetAccount.create ..., overdraft_enabled: true
 
 You can pass a block to `has_accounts` and to define referenced accounts:
 
     class User
-      include Debitcredit::Extension
+      include DebitCredit::Extension
 
       has_accounts do
         income :salary
@@ -156,7 +201,7 @@ You can create entries with a reference. For this case, and in case that
 reference has 'accounts' association, you can use account names instead of objects:
 
     class User
-      include Debitcredit::Extension
+      include DebitCredit::Extension
 
       has_accounts
       has_entries do
@@ -174,8 +219,8 @@ reference has 'accounts' association, you can use account names instead of objec
 You can prepare an inverse entry. For example if you want to rollback an
 existing entry:
 
-rollback = existing.inverse(kind: 'refund', description: 'item is out of stock')
-rollback.save!
+    rollback = existing.inverse(kind: 'refund', description: 'item is out of stock')
+    rollback.save!
 
 ### Overdraft
 
@@ -190,12 +235,9 @@ accounts with `overdraft_enabled: false`.  if this is undesirable, pass
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Bug reports and pull requests are welcome on
+[GitHub](https://github.com/dpaluy/debit_credit-ledger/issues).
 
-# License
+## License
 
-This project rocks and uses MIT-LICENSE.
+This project is released under the MIT License. See [`MIT-LICENSE`](./MIT-LICENSE).

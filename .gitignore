@@ -1,10 +1,14 @@
 .bundle/
 log/*.log
 pkg/
-spec/test_app/db/*.sqlite3
-spec/test_app/db/*.sqlite3-journal
-spec/test_app/log/*.log
-spec/test_app/tmp/
-spec/examples.txt
+*.gem
+vendor/bundle/
+Gemfile.lock
+# dummy app (Rails 8 at test/dummy)
+test/dummy/db/*.sqlite3
+test/dummy/db/*.sqlite3-journal
+test/dummy/log/*.log
+test/dummy/tmp/
 .byebug_history
 .ruby-version
+/coverage/

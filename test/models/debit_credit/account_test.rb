@@ -1,0 +1,178 @@
+require "test_helper"
+
+module DebitCredit
+  class AccountTest < ActiveSupport::TestCase
+    # Fixtures: users(:john), users(:bill), debit_credit_accounts(:name).
+    def equipment = debit_credit_accounts(:equipment)
+    def rent = debit_credit_accounts(:rent)
+    def bank = debit_credit_accounts(:bank)
+    def amex = debit_credit_accounts(:amex)
+    def capital = debit_credit_accounts(:capital)
+    def salary = debit_credit_accounts(:salary)
+
+    test ".by_kind finds account class by kind" do
+      assert_equal DebitCredit::AssetAccount, DebitCredit::Account.by_kind(:asset)
+    end
+
+    test "fixtures are valid" do
+      assert_valid_fixtures(DebitCredit::Account, count: 6)
+    end
+
+    test "[] finds account by name" do
+      assert_equal amex, DebitCredit::Account[:amex]
+    end
+
+    test "[] finds account by name and kind" do
+      assert_equal amex, DebitCredit::Account[:amex, :liability]
+    end
+
+    test "[] creates account if kind is provided and none exists" do
+      assert_difference -> { DebitCredit::Account.count }, 1 do
+        foo = DebitCredit::Account[:foo, :expense]
+
+        assert_instance_of DebitCredit::ExpenseAccount, foo
+        assert_equal "foo", foo.name
+        assert_equal 0, foo.balance
+      end
+    end
+
+    test "[] raises NotFound if none exists and no kind provided" do
+      err = assert_raises(DebitCredit::Account::NotFound) { DebitCredit::Account[:foo] }
+      assert_match(/not found/, err.message)
+    end
+
+    test "[] updates overdraft if different" do
+      assert_not rent.overdraft_enabled?
+      DebitCredit::Account[:rent, :expense, true]
+
+      assert_predicate rent.reload, :overdraft_enabled?
+    end
+
+    test "[] raises BadKind on different kind" do
+      assert_raises(DebitCredit::Account::BadKind) do
+        DebitCredit::Account[:rent, :asset]
+      end
+    end
+
+    test "[] creates with reference via association" do
+      foo = users(:john).accounts[:foo, :asset]
+
+      assert_equal users(:john), foo.reference
+      assert_instance_of DebitCredit::AssetAccount, foo
+      assert_equal "foo", foo.name
+    end
+
+    test ".balanced? is initially true" do
+      assert_predicate DebitCredit::Account, :balanced?
+    end
+
+    test ".balanced? is false if out of balance" do
+      equipment.balance += 1
+      equipment.save!
+
+      assert_not DebitCredit::Account.balanced?
+    end
+
+    test ".balanced? A + Ex = L + E + I" do
+      equipment.balance += 5
+      equipment.save!
+
+      rent.balance += 9
+      rent.save!
+
+      amex.balance += 2
+      amex.save!
+
+      capital.balance += 4
+      capital.save!
+
+      salary.balance += 8
+      salary.save!
+
+      assert_predicate DebitCredit::Account, :balanced?
+    end
+  end
+
+  # Overdraft-disabled behavior.
+  class AccountOverdraftDisabledTest < ActiveSupport::TestCase
+    def described_class
+      DebitCredit::AssetAccount
+    end
+
+    def valid_attrs
+      { name: "foo" }
+    end
+
+    def extra_attrs
+      { overdraft_enabled: false }
+    end
+
+    test "prevents negative balance" do
+      r = record
+      r.save!
+      r.check_overdraft = true
+      r.balance = -1
+
+      assert_not r.valid?
+      assert_not r.errors[:balance].blank?
+    end
+
+    test "ignores overdraft when check_overdraft is false" do
+      r = record
+      r.save!
+      r.balance = -1
+
+      assert_predicate r, :valid?
+    end
+
+    test "allows keeping negative balance" do
+      r = _record(balance: -10)
+      r.save
+      r.check_overdraft = true
+
+      assert_predicate r, :valid?
+    end
+
+    test "allows + on negative balance" do
+      r = _record(balance: -10)
+      r.save
+      r.check_overdraft = true
+      r.balance = -5
+
+      assert_predicate r, :valid?
+    end
+
+    test "allows - on positive balance" do
+      r = _record(balance: 10)
+      r.save
+      r.check_overdraft = true
+      r.balance = 5
+
+      assert_predicate r, :valid?
+    end
+  end
+
+  # Overdraft-enabled behavior.
+  class AccountOverdraftEnabledTest < ActiveSupport::TestCase
+    def described_class
+      DebitCredit::AssetAccount
+    end
+
+    def valid_attrs
+      { name: "foo" }
+    end
+
+    def extra_attrs
+      { overdraft_enabled: true }
+    end
+
+    test "allows negative balance when overdraft_enabled? is true" do
+      r = record
+      r.save!
+      r.balance = -1
+
+      assert_predicate r, :valid?
+      assert_predicate r.errors[:balance], :blank?
+    end
+  end
+end
