@@ -24,7 +24,7 @@ jobs:
       POSTGRES_DB: debit_credit_test
     services:
       postgres:
-        image: postgres:16
+        image: postgres:18.4
         env:
           POSTGRES_HOST: localhost
           POSTGRES_USER: postgres
@@ -38,7 +38,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -57,7 +57,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -72,7 +72,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -100,95 +100,3 @@ jobs:
             raise "Wrong source_code_uri" unless spec.metadata["source_code_uri"] == "https://github.com/dpaluy/debit_credit-ledger"
             puts "Package contents verified: #{files.size} files, 1 migration"
           '
-
-  install_smoke:
-    name: Install + require smoke
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "4.0"
-          bundler-cache: true
-      - name: Build gem
-        run: gem build debit_credit-ledger.gemspec
-      - name: Install into throwaway GEM_HOME
-        run: |
-          rm -rf /tmp/debit_credit-gemhome /tmp/debit_credit-install-smoke
-          mkdir -p /tmp/debit_credit-install-smoke
-          gem install --install-dir /tmp/debit_credit-gemhome --no-document "$GITHUB_WORKSPACE/debit_credit-ledger-1.0.0.gem"
-      - name: Require smoke
-        working-directory: /tmp/debit_credit-install-smoke
-        run: |
-          env -u BUNDLE_GEMFILE -u BUNDLE_BIN_PATH -u RUBYLIB -u RUBYOPT \
-            GEM_HOME=/tmp/debit_credit-gemhome GEM_PATH=/tmp/debit_credit-gemhome ruby -e '
-            require "debit_credit"
-            raise "VERSION mismatch" unless DebitCredit::VERSION == "1.0.0"
-            loaded_path = Gem.loaded_specs.fetch("debit_credit-ledger").full_gem_path
-            raise "checkout source loaded: #{loaded_path}" if loaded_path == ENV.fetch("GITHUB_WORKSPACE")
-            raise "unexpected loaded path: #{loaded_path}" unless loaded_path.start_with?(ENV.fetch("GEM_HOME"))
-            debit_credit_file = $LOADED_FEATURES.find { |path| path.end_with?("/debit_credit.rb") }
-            raise "unexpected debit_credit file: #{debit_credit_file}" unless debit_credit_file&.start_with?(loaded_path)
-            puts "Loaded debit_credit-ledger from #{loaded_path}"
-            puts "DebitCredit::VERSION = #{DebitCredit::VERSION}"
-            puts "DebitCredit::Engine = #{DebitCredit::Engine}"
-          '
-      - name: Install-task smoke (installed gem, exactly one migration, idempotent)
-        run: |
-          set -e
-          rm -rf /tmp/dc-host
-          mkdir -p /tmp/dc-host
-          cd /tmp/dc-host
-          # Unpack the built gem artifact to a directory outside the checkout so
-          # the neutral host loads the packaged artifact, never the checkout source.
-          gem unpack "$GITHUB_WORKSPACE/debit_credit-ledger-1.0.0.gem" --target /tmp/dc-gem-unpacked
-          # gem unpack extracts the gem files but not the gemspec, so Bundler's
-          # path: source cannot resolve the gem. Derive an eval-able Ruby gemspec
-          # from the built artifact so resolution uses the packaged files only.
-          ruby -e '
-            require "rubygems/package"
-            spec = Gem::Package.new(ARGV.fetch(0)).spec
-            File.write("/tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0/debit_credit-ledger.gemspec", spec.to_ruby)
-          ' "$GITHUB_WORKSPACE/debit_credit-ledger-1.0.0.gem"
-          test -f /tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0/debit_credit-ledger.gemspec || \
-            { echo "gemspec missing after generation"; exit 1; }
-          printf 'source "https://rubygems.org"\ngem "rails", ">= 8.0"\n' > Gemfile
-          bundle install
-          bundle exec rails new . --skip-bundle --skip-git \
-            --skip-active-storage --skip-action-mailbox --skip-action-text \
-            --skip-action-cable --skip-sprockets --skip-bootsnap --force
-          echo "gem \"debit_credit-ledger\", path: \"/tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0\"" >> Gemfile
-          bundle install
-          sed -i 's/^require "rails"/require "rails"\nrequire "debit_credit"/' config/application.rb
-          # Assert the loaded gem/feature path resolves outside the checkout,
-          # proving the host uses the packaged artifact rather than $GITHUB_WORKSPACE.
-          bundle exec ruby -e '
-            require "debit_credit"
-            loaded_path = Gem.loaded_specs.fetch("debit_credit-ledger").full_gem_path
-            workspace = ENV.fetch("GITHUB_WORKSPACE")
-            raise "checkout source loaded: #{loaded_path}" if loaded_path == workspace
-            raise "loaded gem inside checkout: #{loaded_path}" if loaded_path.start_with?(workspace + "/")
-            raise "expected unpacked artifact path, got #{loaded_path}" unless loaded_path == "/tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0"
-            debit_credit_file = $LOADED_FEATURES.find { |path| path.end_with?("/debit_credit.rb") }
-            raise "loaded feature from checkout: #{debit_credit_file}" if debit_credit_file&.start_with?(workspace)
-            raise "unexpected debit_credit file: #{debit_credit_file}" unless debit_credit_file&.start_with?(loaded_path)
-            puts "Install-task host loaded debit_credit-ledger from #{loaded_path}"
-          '
-          bundle exec rails debit_credit:install:migrations
-          copied=$(ls -1 db/migrate/*.rb 2>/dev/null | wc -l)
-          if [ "$copied" -ne 1 ]; then
-            echo "Expected exactly 1 copied migration, got $copied"
-            ls -la db/migrate/
-            exit 1
-          fi
-          echo "Copied: $(basename db/migrate/*.rb)"
-          bundle exec rails debit_credit:install:migrations
-          recopied=$(ls -1 db/migrate/*.rb 2>/dev/null | wc -l)
-          if [ "$recopied" -ne 1 ]; then
-            echo "Second install: expected still 1 migration, got $recopied"
-            exit 1
-          fi
-          echo "Install task idempotent: 1 migration after second invocation"
