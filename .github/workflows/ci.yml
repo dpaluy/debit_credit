@@ -145,6 +145,16 @@ jobs:
           # Unpack the built gem artifact to a directory outside the checkout so
           # the neutral host loads the packaged artifact, never the checkout source.
           gem unpack "$GITHUB_WORKSPACE/debit_credit-ledger-1.0.0.gem" --target /tmp/dc-gem-unpacked
+          # gem unpack extracts the gem files but not the gemspec, so Bundler's
+          # path: source cannot resolve the gem. Derive an eval-able Ruby gemspec
+          # from the built artifact so resolution uses the packaged files only.
+          ruby -e '
+            require "rubygems/package"
+            spec = Gem::Package.new(ENV.fetch("GEM")).spec
+            File.write("/tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0/debit_credit-ledger.gemspec", spec.to_ruby)
+          ' GEM="$GITHUB_WORKSPACE/debit_credit-ledger-1.0.0.gem"
+          test -f /tmp/dc-gem-unpacked/debit_credit-ledger-1.0.0/debit_credit-ledger.gemspec || \
+            { echo "gemspec missing after generation"; exit 1; }
           printf 'source "https://rubygems.org"\ngem "rails", ">= 8.0"\n' > Gemfile
           bundle install
           bundle exec rails new . --skip-bundle --skip-git \
