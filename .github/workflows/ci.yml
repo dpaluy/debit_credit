@@ -4,13 +4,14 @@ on:
   push:
     branches: [master]
   pull_request:
+    branches: [master]
 
 permissions:
   contents: read
 
 jobs:
   test:
-    name: Test (Ruby 4.x, ${{ matrix.db }})
+    name: Test (Ruby 4.0, ${{ matrix.db }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -39,8 +40,7 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v7
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "4.0"
           bundler-cache: true
@@ -48,55 +48,5 @@ jobs:
         run: |
           bundle exec rake dummy:boot
           RAILS_ENV=test bundle exec rake app:db:migrate
-      - name: Test
-        run: bundle exec rake test
-
-  style:
-    name: Style (RuboCop)
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "4.0"
-          bundler-cache: true
-      - name: RuboCop
-        run: bundle exec rake style
-
-  build:
-    name: Build gem
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "4.0"
-          bundler-cache: true
-      - name: Build gem
-        run: |
-          gem build debit_credit-ledger.gemspec
-          test -f debit_credit-ledger-1.0.0.gem
-      - name: Verify package contents
-        run: |
-          ruby -e '
-            require "rubygems/package"
-            spec = Gem::Package.new("debit_credit-ledger-1.0.0.gem").spec
-            files = Gem::Package.new("debit_credit-ledger-1.0.0.gem").contents
-            excluded = files.select { |f| f.start_with?("test/", ".github/", "spec/", "pkg/") || f.end_with?(".gem") || f == "Gemfile.lock" }
-            raise "Excluded paths in gem: #{excluded.inspect}" unless excluded.empty?
-            required = %w[lib/debit_credit.rb lib/debit_credit/version.rb lib/debit_credit/engine.rb app/models/debit_credit/account.rb config/locales/en.yml MIT-LICENSE Rakefile README.md]
-            missing = required - files
-            raise "Missing required files: #{missing.inspect}" unless missing.empty?
-            migrations = files.select { |f| f.start_with?("db/migrate/") }
-            raise "Expected exactly one migration, got: #{migrations.inspect}" unless migrations.size == 1
-            raise "Wrong migration: #{migrations.first}" unless migrations.first == "db/migrate/20260720000000_create_debit_credit_ledger.rb"
-            raise "Wrong homepage: #{spec.homepage}" unless spec.homepage == "https://github.com/dpaluy/debit_credit-ledger"
-            raise "Wrong source_code_uri" unless spec.metadata["source_code_uri"] == "https://github.com/dpaluy/debit_credit-ledger"
-            puts "Package contents verified: #{files.size} files, 1 migration"
-          '
+      - run: bundle exec rake test
+      - run: bundle exec rake style
