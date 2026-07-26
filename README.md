@@ -165,7 +165,7 @@ Or better yet:
     end
 
 By default accounts are prevented from having a negative balance, but you can
-pass `overdraft_enabled: false` to allow it:
+pass `overdraft_enabled: true` to allow it:
 
     DebitCredit::AssetAccount.create ..., overdraft_enabled: true
 
